@@ -36,6 +36,9 @@ npm run android
 
 #### Resources:
 
+- Live dev-server [API gateway](https://github.am/api)
+- Mobile app wireframe paper screens at [Figma](https://www.figma.com/file/YMm2ALVLry7LMFF2hN5T1T/ProjectRun-%5Bwireframe-screens%5D?type=design&mode=design&t=BTY8nfsxSGpHvoL0-1)
+- Mobile app wireframe animation video on [YouTube](https://www.youtube.com/watch?v=ho1Nbal3z6s)
 - GitLab [group](https://gitlab.com/projectrun)
 - Trello [board](https://trello.com/b/oiUvRWb1/projectrun-mobile)
 - Postman [workspace](https://go.postman.co/workspace/4c1f641c-e02c-4aa5-b636-565308855c75)
