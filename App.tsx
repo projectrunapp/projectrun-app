@@ -6,6 +6,7 @@ import HomeScreen from "./app/screens/HomeScreen";
 import AuthScreen from "./app/screens/AuthScreen";
 import {ActivityIndicator, Button, StyleSheet, View} from "react-native";
 import {Provider as PaperProvider} from "react-native-paper";
+import SingleRunScreen from "./app/screens/SingleRunScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,9 +32,15 @@ export const Layout = () => {
           <NavigationContainer>
               <Stack.Navigator>
                   {authState?.authenticated ? (
-                      <Stack.Screen name="Home" component={HomeScreen} options={{
-                          headerRight: () => <Button onPress={onLogout} title="Log out" />
-                      }}></Stack.Screen>
+                      <>
+                          <Stack.Screen name="Home" component={HomeScreen} options={{
+                              headerRight: () => <Button onPress={onLogout} title="Log out" />
+                          }}></Stack.Screen>
+                          <Stack.Screen name="SingleRunScreen"
+                                        component={SingleRunScreen}
+                                        options={({ route }) => ({ title: `${route.params.title}` })}
+                          ></Stack.Screen>
+                      </>
                   ) : (
                       <Stack.Screen name="Authentication" component={AuthScreen}></Stack.Screen>
                   )}

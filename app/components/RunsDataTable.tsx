@@ -5,14 +5,21 @@ import {API_URL} from "@env"
 import axios from "axios";
 import {useAuth} from "../context/AuthContext";
 import {paginationPerPages} from "../utils/constants";
+import {useNavigation} from "@react-navigation/native";
 
 const RunsDataTable = () => {
+    const navigation = useNavigation();
     const { authState } = useAuth();
+
     const [page, setPage] = useState(0);
     const [runs, setRuns] = useState([]);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [perPage, setPerPage] = useState(paginationPerPages[0]); // 10
+
+    const navigateToSingleRun = (runId: number, title: string) => {
+        navigation.navigate('SingleRunScreen', { runId, title });
+    };
 
     const loadRuns = async () => {
         setLoading(true);
@@ -45,7 +52,7 @@ const RunsDataTable = () => {
                     </DataTable.Row>
                 ) : (
                     runs.map((run, index) => (
-                        <DataTable.Row key={index}>
+                        <DataTable.Row key={index} onPress={() => navigateToSingleRun(run.id, run.title)}>
                             <DataTable.Cell>{run.id}</DataTable.Cell>
                             <DataTable.Cell>{run.title}</DataTable.Cell>
                         </DataTable.Row>
