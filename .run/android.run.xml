@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="android" type="js.build_tools.npm" nameIsGenerated="true">
+    <package-json value="$PROJECT_DIR$/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="android" />
+    </scripts>
+    <node-interpreter value="$USER_HOME$/.nvm/versions/node/v18.16.0/bin/node" />
+    <envs>
+      <env name="ANDROID_HOME" value="$USER_HOME$/Android/Sdk" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>
