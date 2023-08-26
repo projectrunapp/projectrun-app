@@ -32,24 +32,46 @@ npm install
 npm run android
 ```
 
-- Build the app:
+#### Build the app:
+
+- Make sure to have installed and setup all the necessary things written [here](https://docs.expo.dev/build/setup/)
+
+- Make sure to have installed [eas-cli](https://github.com/expo/eas-cli)
 ```bash
-# make sure to have installed and setup all the necessary things written [here](https://docs.expo.dev/build/setup/)
-
-# make sure to have installed [eas-cli](https://github.com/expo/eas-cli)
 npm install -g eas-cli
+```
 
-# make sure to have "eas.json" file in the root directory of the project similar to the "eas.json.example" file
+- Make sure to have "eas.json" file in the root directory of the project similar to the "eas.json.example" file
 
-# make sure to have included all the environment variables written [here](https://docs.expo.dev/build-reference/variables/)
+- Make sure to have included all the environment variables written [here](https://docs.expo.dev/build-reference/variables/)
 
-# [Build APKs for Android Emulators and devices](https://docs.expo.dev/build-reference/apk/)
+- [Build APKs for Android Emulators and devices](https://docs.expo.dev/build-reference/apk/)
+```bash
 eas build -p android --profile preview
+```
+
+- Optional:
+```bash
+# generate "eas.json" file
+eas build:configure
+
+# build for android
+eas build --profile development --platform android
+
+# start dev client
+expo start --dev-client
 ```
 
 
 
-#### Resources:
+#### Useful Resources:
+
+- Expo [Environment variables and secrets in EAS Build](https://docs.expo.dev/build-reference/variables)
+- Expo [Billing](https://expo.dev/accounts/boolfalse/settings/billing)
+
+
+
+#### Product Resources:
 
 - Live dev-server [API gateway](https://github.am/api)
 - Mobile app wireframe paper screens at [Figma](https://www.figma.com/file/YMm2ALVLry7LMFF2hN5T1T/ProjectRun-%5Bwireframe-screens%5D?type=design&mode=design&t=BTY8nfsxSGpHvoL0-1)
