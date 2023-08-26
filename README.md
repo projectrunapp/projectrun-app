@@ -32,6 +32,21 @@ npm install
 npm run android
 ```
 
+- Build the app:
+```bash
+# make sure to have installed and setup all the necessary things written [here](https://docs.expo.dev/build/setup/)
+
+# make sure to have installed [eas-cli](https://github.com/expo/eas-cli)
+npm install -g eas-cli
+
+# make sure to have "eas.json" file in the root directory of the project similar to the "eas.json.example" file
+
+# make sure to have included all the environment variables written [here](https://docs.expo.dev/build-reference/variables/)
+
+# [Build APKs for Android Emulators and devices](https://docs.expo.dev/build-reference/apk/)
+eas build -p android --profile preview
+```
+
 
 
 #### Resources:

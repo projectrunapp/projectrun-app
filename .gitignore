@@ -473,3 +473,9 @@ modules.xml
 *.ipr
 
 # End of https://www.toptal.com/developers/gitignore/api/reactnative,webstorm+iml,intellij+all,jetbrains+all,visualstudiocode
+
+
+
+# Custom
+
+eas.json
