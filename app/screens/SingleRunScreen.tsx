@@ -1,6 +1,5 @@
 
 import {ActivityIndicator, ScrollView, StyleSheet, Text, View} from "react-native";
-import {API_URL} from "@env"
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext";
@@ -15,7 +14,7 @@ const SingleRunScreen = ({ route }: any) => {
 
     const loadRun = async (id: number) => {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/run/my-runs/${id}`, {
+        const response = await axios.get(`${process.env.API_URL}/run/my-runs/${id}`, {
             headers: {
                 Authorization: `Bearer ${authState!.token}`,
             }

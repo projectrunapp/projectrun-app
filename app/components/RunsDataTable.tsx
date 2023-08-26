@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { DataTable } from 'react-native-paper';
-import {API_URL} from "@env"
 import axios from "axios";
 import {useAuth} from "../context/AuthContext";
 import {paginationPerPages} from "../utils/constants";
@@ -23,7 +22,7 @@ const RunsDataTable = () => {
 
     const loadRuns = async () => {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/run/my-runs?page=${page + 1}&per_page=${perPage}`, {
+        const response = await axios.get(`${process.env.API_URL}/run/my-runs?page=${page + 1}&per_page=${perPage}`, {
             headers: {
                 Authorization: `Bearer ${authState!.token}`,
             }

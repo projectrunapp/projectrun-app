@@ -2,7 +2,6 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
-import {JWT_KEY, API_URL} from "@env"
 
 interface AuthProps {
     authState?: { token: string | null; authenticated: boolean | null },
@@ -35,7 +34,7 @@ export const AuthProvider = ({children}: any) => {
     const login = async (email: string, password: string) => {
         try {
             setAuthLoading(true);
-            const response = await axios.post(`${API_URL}/auth/login`, {email, password});
+            const response = await axios.post(`${process.env.API_URL}/auth/login`, {email, password});
             if (!response.data.success) {
                 setAuthLoading(false);
                 return {
@@ -50,7 +49,7 @@ export const AuthProvider = ({children}: any) => {
                 authenticated: true,
             });
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            await SecureStore.setItemAsync(JWT_KEY, token);
+            await SecureStore.setItemAsync(process.env.JWT_KEY, token);
             setAuthLoading(false);
 
             return response.data;
@@ -71,7 +70,7 @@ export const AuthProvider = ({children}: any) => {
                             gender: string) => {
         try {
             setAuthLoading(true);
-            const response = await axios.post(`${API_URL}/auth/register`, {
+            const response = await axios.post(`${process.env.API_URL}/auth/register`, {
                 email,
                 password,
                 username,
@@ -98,7 +97,7 @@ export const AuthProvider = ({children}: any) => {
     }
 
     const logout = async () => {
-        await SecureStore.deleteItemAsync(JWT_KEY);
+        await SecureStore.deleteItemAsync(process.env.JWT_KEY);
 
         axios.defaults.headers.common['Authorization'] = '';
 
@@ -110,7 +109,7 @@ export const AuthProvider = ({children}: any) => {
 
     const loadToken = async () => {
         setAuthLoading(true);
-        const token = await SecureStore.getItemAsync(JWT_KEY);
+        const token = await SecureStore.getItemAsync(process.env.JWT_KEY);
         if (token) {
             setAuthState({
                 token: token,
