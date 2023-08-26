@@ -49,8 +49,7 @@ const AuthScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Image source={{uri: splashLogoUrl}}
-                   style={styles.image} alt="Logo" />
+            <Image source={{uri: splashLogoUrl}} style={styles.image} alt="Logo" />
             {showLogin ? (
                 <View style={styles.form}>
                     <TextInput style={styles.input} placeholder="Email" onChangeText={(text: string) => setEmail(text)} value={email} />
