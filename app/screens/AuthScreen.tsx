@@ -9,8 +9,10 @@ import { splashLogoUrl } from "../utils/constants";
 
 const AuthScreen = () => {
 
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
+    const [loginEmail, setLoginEmail] = useState<string>(process.env.DEV_USER_EMAIL || '');
+    const [loginPassword, setLoginPassword] = useState<string>(process.env.DEV_USER_PASSWORD || '');
+    const [registerEmail, setRegisterEmail] = useState<string>('');
+    const [registerPassword, setRegisterPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [name, setName] = useState<string>('');
     const [selectedGender, setSelectedGender] = useState<string>(genders[0].value);
@@ -34,14 +36,14 @@ const AuthScreen = () => {
     const {onLogin, onRegister} = useAuth();
 
     const pressLogin = async () => {
-        const result = await onLogin!(email, password);
+        const result = await onLogin!(loginEmail, loginPassword);
         if (result && result.error) {
             alert(result.message);
         }
     }
 
     const pressRegister = async () => {
-        const result = await onRegister!(email, password , username, name, birthDate, selectedGender);
+        const result = await onRegister!(registerEmail, registerPassword , username, name, birthDate, selectedGender);
         if (result && result.error) {
             alert(result.message);
         }
@@ -49,51 +51,41 @@ const AuthScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Image source={{uri: splashLogoUrl}} style={styles.image} alt="Logo" />
+            <Image source={{uri: splashLogoUrl}} style={styles.image} alt="Logo"/>
             {showLogin ? (
                 <View style={styles.form}>
-                    <TextInput style={styles.input} placeholder="Email" onChangeText={(text: string) => setEmail(text)} value={email} />
-                    <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} onChangeText={(password: string) => setPassword(password)} value={password} />
+                    <TextInput style={styles.input} placeholder="Email"
+                               onChangeText={(currentText: string) => setLoginEmail(currentText)}
+                               value={loginEmail}/>
+                    <TextInput style={styles.input} placeholder="Password" secureTextEntry={true}
+                               onChangeText={(currentText: string) => setLoginPassword(currentText)}
+                               value={loginPassword}/>
 
                     <Pressable style={styles.submit_btn} onPress={pressLogin}>
                         <Text style={styles.submit_btn_text}>Login</Text>
                     </Pressable>
+
                     <Text style={styles.btn_top_text}>Don't have an account?</Text>
-                    <Button styles={styles.navigate_btn} title="Register" className="btn" onPress={(e) => setShowLogin(false)} />
+                    <Button styles={styles.navigate_btn} title="Register" className="btn"
+                            onPress={(e) => setShowLogin(false)}/>
                 </View>
             ) : (
                 <View style={styles.form}>
-
-                    <TextInput style={styles.input}
-                               placeholder="Email"
-                               onChangeText={(text: string) => setEmail(text)}
-                               value={email}
-                    />
-
-                    <TextInput style={styles.input}
-                               placeholder="Password"
-                               secureTextEntry={true}
-                               onChangeText={(password: string) => setPassword(password)}
-                               value={password}
-                    />
-
-                    <TextInput style={styles.input}
-                               placeholder="Username"
+                    <TextInput style={styles.input} placeholder="Email"
+                               onChangeText={(currentText: string) => setRegisterEmail(currentText)}
+                               value={registerEmail}/>
+                    <TextInput style={styles.input} placeholder="Password" secureTextEntry={true}
+                               onChangeText={(currentText: string) => setRegisterPassword(currentText)}
+                               value={registerPassword}/>
+                    <TextInput style={styles.input} placeholder="Username"
                                onChangeText={(text: string) => setUsername(text)}
-                               value={username}
-                    />
-
-                    <TextInput style={styles.input}
-                               placeholder="Name"
+                               value={username}/>
+                    <TextInput style={styles.input} placeholder="Name"
                                onChangeText={(text: string) => setName(text)}
-                               value={name}
-                    />
-
-                    <TextInput style={styles.input}
-                               placeholder="Birth Date"
-                               value={birthDate}
+                               value={name}/>
+                    <TextInput style={styles.input} placeholder="Birth Date"
                                onFocus={() => setShowDatePicker(true)}
-                    />
+                               value={birthDate}/>
                     {showDatePicker && (
                         <DateTimePicker
                             value={date}
@@ -104,12 +96,11 @@ const AuthScreen = () => {
                             style={styles.date_picker}
                         />
                     )}
-
                     <Picker onValueChange={(itemValue, itemIndex) => setSelectedGender(itemValue)}
                             style={styles.input}
                             selectedValue={selectedGender}>
                         {genders.map(option => (
-                            <Picker.Item key={option.value} label={option.label} value={option.value} />
+                            <Picker.Item key={option.value} label={option.label} value={option.value}/>
                         ))}
                     </Picker>
 
@@ -118,12 +109,8 @@ const AuthScreen = () => {
                     </Pressable>
 
                     <Text style={styles.btn_top_text}>Already have an account?</Text>
-                    <Button styles={styles.navigate_btn}
-                            title="Login"
-                            className="btn"
-                            onPress={(e) => setShowLogin(true)}
-                    />
-
+                    <Button styles={styles.navigate_btn} title="Login" className="btn"
+                            onPress={(e) => setShowLogin(true)}/>
                 </View>
             )}
         </View>
