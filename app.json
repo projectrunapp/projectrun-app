@@ -25,7 +25,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.boolfalse.ProjectRunApp"
+      "package": "com.boolfalse.ProjectRunApp",
+      "config": {
+        "googleMaps": {
+          "apiKey": "this will be overwritten by the app.config.ts file"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
