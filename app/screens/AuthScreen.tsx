@@ -6,6 +6,7 @@ import {useAuth} from "../context/AuthContext";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { genders } from "../utils/enums";
 import { splashLogoUrl } from "../utils/constants";
+import Constants from 'expo-constants';
 
 const AuthScreen = () => {
 
@@ -135,6 +136,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff'
     },
     container: {
+        marginTop: Constants.statusBarHeight + 10,
         alignItems: 'center',
         width: '100%',
     },

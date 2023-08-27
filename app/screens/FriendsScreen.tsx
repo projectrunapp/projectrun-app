@@ -2,7 +2,7 @@
 import * as React from 'react';
 import {TouchableOpacity, StyleSheet, View, Text, SafeAreaView} from 'react-native';
 
-const FriendsScreen = ({ navigation }) => {
+const FriendsScreen = ({ route, navigation }) => {
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <View style={{ flex: 1, padding: 16 }}>
