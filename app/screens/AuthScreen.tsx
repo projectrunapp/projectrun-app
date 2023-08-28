@@ -1,12 +1,12 @@
 
-import {Button, Image, Platform, Pressable, StyleSheet, Text, TextInput, View, Keyboard} from "react-native";
+import {Image, Platform, Pressable, StyleSheet, Text, TextInput, View, Keyboard} from "react-native";
 import {Picker} from '@react-native-picker/picker';
 import {useState} from "react";
 import {useAuth} from "../context/AuthContext";
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { genders } from "../utils/enums";
-import { splashLogoUrl } from "../utils/constants";
+import {appPrimaryColor, appSecondaryColor, splashLogoUrl} from "../utils/app-constants";
 import Constants from 'expo-constants';
+import RNDateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker
 
 const AuthScreen = () => {
 
@@ -66,9 +66,9 @@ const AuthScreen = () => {
                         <Text style={styles.submit_btn_text}>Login</Text>
                     </Pressable>
 
-                    <Text style={styles.btn_top_text}>Don't have an account?</Text>
-                    <Button styles={styles.navigate_btn} title="Register" className="btn"
-                            onPress={(e) => setShowLogin(false)}/>
+                    <Text style={styles.navigate_text}>
+                        Don't have an account? <Text style={styles.navigate_link} onPress={(e) => setShowLogin(false)}>Register</Text>
+                    </Text>
                 </View>
             ) : (
                 <View style={styles.form}>
@@ -88,30 +88,27 @@ const AuthScreen = () => {
                                onFocus={() => setShowDatePicker(true)}
                                value={birthDate}/>
                     {showDatePicker && (
-                        <DateTimePicker
-                            value={date}
-                            // mode={'date'}
-                            // display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                            // is24Hour={true}
-                            onChange={changeDate}
-                            style={styles.date_picker}
-                        />
+                        <RNDateTimePicker value={date} onChange={changeDate}/>
                     )}
-                    <Picker onValueChange={(itemValue, itemIndex) => setSelectedGender(itemValue)}
-                            style={styles.input}
-                            selectedValue={selectedGender}>
-                        {genders.map(option => (
-                            <Picker.Item key={option.value} label={option.label} value={option.value}/>
-                        ))}
-                    </Picker>
+                    <View style={styles.picker_container}>
+                        <Picker onValueChange={(itemValue, itemIndex) => setSelectedGender(itemValue)}
+                                selectedValue={selectedGender}>
+                            {genders.map((option, index) => (
+                                <Picker.Item style={index === 0 ? {
+                                    color: '#9e9e9e',
+                                    fontSize: 14,
+                                } : {}} key={index} label={option.label} value={option.value}/>
+                            ))}
+                        </Picker>
+                    </View>
 
                     <Pressable style={styles.submit_btn} onPress={pressRegister}>
                         <Text style={styles.submit_btn_text}>Register</Text>
                     </Pressable>
 
-                    <Text style={styles.btn_top_text}>Already have an account?</Text>
-                    <Button styles={styles.navigate_btn} title="Login" className="btn"
-                            onPress={(e) => setShowLogin(true)}/>
+                    <Text style={styles.navigate_text}>
+                        Already have an account? <Text style={styles.navigate_link} onPress={(e) => setShowLogin(true)}>Login</Text>
+                    </Text>
                 </View>
             )}
         </View>
@@ -135,14 +132,24 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff'
     },
+    picker_container: {
+        borderRadius: 4,
+        overflow: 'hidden',
+        backgroundColor: '#fff',
+        borderColor: '#000',
+        borderWidth: 1,
+        paddingVertical: 0,
+    },
     container: {
         marginTop: Constants.statusBarHeight + 10,
         alignItems: 'center',
         width: '100%',
     },
-    navigate_btn: {
-        backgroundColor: '#098',
-        color: '#fff',
+    navigate_text: {
+        marginTop: 20,
+    },
+    navigate_link: {
+        color: appSecondaryColor,
     },
     submit_btn: {
         alignItems: 'center',
@@ -151,7 +158,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 32,
         borderRadius: 4,
         elevation: 3,
-        backgroundColor: '#F5F411',
+        backgroundColor: appPrimaryColor,
     },
     submit_btn_text: {
         fontSize: 16,
@@ -159,9 +166,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         letterSpacing: 0.25,
         color: '#fff',
-    },
-    btn_top_text: {
-        marginTop: 10,
     },
     date_picker: {
         width: 320,

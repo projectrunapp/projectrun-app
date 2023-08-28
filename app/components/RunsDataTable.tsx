@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { DataTable } from 'react-native-paper';
 import axios from "axios";
 import {useAuth} from "../context/AuthContext";
-import {paginationPerPages} from "../utils/constants";
+import {paginationPerPages} from "../utils/app-constants";
 import {useNavigation} from "@react-navigation/native";
 
 const RunsDataTable = () => {

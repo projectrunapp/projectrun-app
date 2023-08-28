@@ -7,6 +7,7 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
 import HomeStack from "../stacks/HomeStack";
 import FriendsStack from "../stacks/FriendStack";
 import RunStack from "../stacks/RunStack";
+import {appSecondaryColor} from "../utils/app-constants";
 
 const Tab = createBottomTabNavigator();
 
@@ -18,7 +19,7 @@ const AuthLayout = () => {
             {authState?.authenticated ? (
                 <Tab.Navigator initialRouteName="Home" screenOptions={({ route }) => ({
                     // headerShown: false,
-                    tabBarActiveTintColor: '#42f44b',
+                    tabBarActiveTintColor: appSecondaryColor,
                 })}>
                     <Tab.Screen name="HomeStack" component={HomeStack} options={{
                         headerShown: false,
