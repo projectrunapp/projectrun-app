@@ -2,7 +2,7 @@
 import {AuthProvider, useAuth} from "./app/context/AuthContext";
 import {ActivityIndicator, StyleSheet, View} from "react-native";
 import {Provider as PaperProvider} from "react-native-paper";
-import AuthLayout from "./app/screens/AuthLayout";
+import AppLayout from "./app/screens/AppLayout";
 
 const App = () => {
     const { authLoading } = useAuth();
@@ -16,7 +16,7 @@ const App = () => {
                             <ActivityIndicator size="large" />
                         </View>
                     ) : (
-                        <AuthLayout />
+                        <AppLayout />
                     )
                 }
             </PaperProvider>

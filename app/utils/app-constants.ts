@@ -6,3 +6,17 @@ export const paginationPerPages = [5, 10, 25, 50];
 
 export const activeBtnTextColor = '#fff';
 export const inactiveBtnTextColor = '#000';
+
+export const stopRunBtnPressSeconds = 3;
+export const runStates = {
+    NOT_STARTED: 0,
+    RUNNING: 1,
+    PAUSED: 2,
+    FINISHED: 3,
+};
+export const runStateTitles = {
+    0: 'Not Started',
+    1: 'Running',
+    2: 'Paused',
+    3: 'Finished',
+};

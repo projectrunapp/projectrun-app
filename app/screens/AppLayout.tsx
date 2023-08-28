@@ -7,11 +7,11 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
 import HomeStack from "../stacks/HomeStack";
 import FriendsStack from "../stacks/FriendStack";
 import RunStack from "../stacks/RunStack";
-import {appSecondaryColor} from "../utils/app-constants";
+import {appPrimaryColor} from "../utils/app-constants";
 
 const Tab = createBottomTabNavigator();
 
-const AuthLayout = () => {
+const AppLayout = () => {
     const { authState } = useAuth();
 
     return (
@@ -19,7 +19,7 @@ const AuthLayout = () => {
             {authState?.authenticated ? (
                 <Tab.Navigator initialRouteName="Home" screenOptions={({ route }) => ({
                     // headerShown: false,
-                    tabBarActiveTintColor: appSecondaryColor,
+                    tabBarActiveTintColor: appPrimaryColor,
                 })}>
                     <Tab.Screen name="HomeStack" component={HomeStack} options={{
                         headerShown: false,
@@ -50,4 +50,4 @@ const AuthLayout = () => {
     );
 };
 
-export default AuthLayout;
+export default AppLayout;
