@@ -1,14 +1,22 @@
 
-import {Image, Platform, Pressable, StyleSheet, Text, TextInput, View, Keyboard} from "react-native";
+import {Image, Platform, Pressable, StyleSheet, Text, TextInput, View, TouchableOpacity} from "react-native";
 import {Picker} from '@react-native-picker/picker';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext";
 import { genders } from "../utils/enums";
-import {appPrimaryColor, appSecondaryColor, splashLogoUrl} from "../utils/app-constants";
+import {
+    activeBtnTextColor,
+    appPrimaryColor,
+    appSecondaryColor,
+    inactiveBtnTextColor,
+    splashLogoUrl
+} from "../utils/app-constants";
 import Constants from 'expo-constants';
 import RNDateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker
 
 const AuthScreen = () => {
+    const [isLoginBtnActive, setIsLoginBtnActive] = useState<boolean>(false);
+    const [isRegisterBtnActive, setIsRegisterBtnActive] = useState<boolean>(false);
 
     const [loginEmail, setLoginEmail] = useState<string>(process.env.DEV_USER_EMAIL || '');
     const [loginPassword, setLoginPassword] = useState<string>(process.env.DEV_USER_PASSWORD || '');
@@ -29,7 +37,6 @@ const AuthScreen = () => {
         setShowDatePicker(Platform.OS === 'ios');
         setDate(currentDate);
         setBirthDate(dateFormat(currentDate));
-        Keyboard.dismiss();
     }
 
     const [showLogin, setShowLogin] = useState<boolean>(true);
@@ -50,6 +57,14 @@ const AuthScreen = () => {
         }
     }
 
+    useEffect(() => {
+        setIsLoginBtnActive(!!(loginEmail && loginPassword));
+    }, [loginEmail, loginPassword]);
+
+    useEffect(() => {
+        setIsRegisterBtnActive(!!(registerEmail && registerPassword && username && name && birthDate));
+    }, [registerEmail, registerPassword, username, name, birthDate]);
+
     return (
         <View style={styles.container}>
             <Image source={{uri: splashLogoUrl}} style={styles.image} alt="Logo"/>
@@ -62,8 +77,12 @@ const AuthScreen = () => {
                                onChangeText={(currentText: string) => setLoginPassword(currentText)}
                                value={loginPassword}/>
 
-                    <Pressable style={styles.submit_btn} onPress={pressLogin}>
-                        <Text style={styles.submit_btn_text}>Login</Text>
+                    <Pressable style={[styles.submit_btn, {
+                        backgroundColor: isLoginBtnActive ? appPrimaryColor : '#ccc',
+                    }]} onPress={pressLogin}>
+                        <Text style={[styles.submit_btn_text, {
+                            color: isLoginBtnActive ? activeBtnTextColor : inactiveBtnTextColor,
+                        }]}>Login</Text>
                     </Pressable>
 
                     <Text style={styles.navigate_text}>
@@ -84,9 +103,9 @@ const AuthScreen = () => {
                     <TextInput style={styles.input} placeholder="Name"
                                onChangeText={(text: string) => setName(text)}
                                value={name}/>
-                    <TextInput style={styles.input} placeholder="Birth Date"
-                               onFocus={() => setShowDatePicker(true)}
-                               value={birthDate}/>
+                    <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                        <TextInput style={styles.input} placeholder="Birth Date" editable={false} value={birthDate}/>
+                    </TouchableOpacity>
                     {showDatePicker && (
                         <RNDateTimePicker value={date} onChange={changeDate}/>
                     )}
@@ -102,8 +121,12 @@ const AuthScreen = () => {
                         </Picker>
                     </View>
 
-                    <Pressable style={styles.submit_btn} onPress={pressRegister}>
-                        <Text style={styles.submit_btn_text}>Register</Text>
+                    <Pressable style={[styles.submit_btn, {
+                        backgroundColor: isRegisterBtnActive ? appPrimaryColor : '#ccc',
+                    }]} onPress={pressRegister}>
+                        <Text style={[styles.submit_btn_text, {
+                            color: isRegisterBtnActive ? activeBtnTextColor : inactiveBtnTextColor,
+                        }]}>Register</Text>
                     </Pressable>
 
                     <Text style={styles.navigate_text}>
@@ -130,6 +153,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 4,
         padding: 10,
+        color: '#000',
         backgroundColor: '#fff'
     },
     picker_container: {
@@ -158,14 +182,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 32,
         borderRadius: 4,
         elevation: 3,
-        backgroundColor: appPrimaryColor,
     },
     submit_btn_text: {
         fontSize: 16,
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
-        color: '#fff',
     },
     date_picker: {
         width: 320,
