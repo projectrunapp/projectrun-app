@@ -7,7 +7,9 @@ export const paginationPerPages = [5, 10, 25, 50];
 export const activeBtnTextColor = '#fff';
 export const inactiveBtnTextColor = '#000';
 
+export const startRunBtnPressSeconds = 3;
 export const stopRunBtnPressSeconds = 3;
+export const guaranteeSecondsAfterStartBtnPress = 3;
 export const runStates = {
     NOT_STARTED: 0,
     RUNNING: 1,
