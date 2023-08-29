@@ -23,8 +23,9 @@ const RunsDataTable = () => {
     const loadRuns = async () => {
         setLoading(true);
         const response = await axios.get(`${process.env.API_URL}/run/my-runs?page=${page + 1}&per_page=${perPage}`, {
-            headers: {
-                Authorization: `Bearer ${authState!.token}`,
+            "headers": {
+                "Authorization": `Bearer ${authState!.token}`,
+                "Content-Type": "application/json",
             }
         });
         if (response.data.success && response.data.data.runs) {

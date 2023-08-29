@@ -7,6 +7,8 @@ export const paginationPerPages = [5, 10, 25, 50];
 export const activeBtnTextColor = '#fff';
 export const inactiveBtnTextColor = '#000';
 
+export const userDefaultAvatarUrl = "https://avatars.githubusercontent.com/u/22226570?s=96&v=4";
+
 export const startRunBtnPressSeconds = 3;
 export const stopRunBtnPressSeconds = 3;
 export const guaranteeSecondsAfterStartBtnPress = 3;
