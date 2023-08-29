@@ -5,7 +5,7 @@ import AuthScreen from "./AuthScreen";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import HomeStack from "../stacks/HomeStack";
-import FriendsStack from "../stacks/FriendStack";
+import FriendshipStack from "../stacks/FriendshipStack";
 import RunStack from "../stacks/RunStack";
 import {appPrimaryColor} from "../utils/app-constants";
 
@@ -35,9 +35,9 @@ const AppLayout = () => {
                             <MaterialCommunityIcons name="run-fast" color={color} size={size}/>
                         ),
                     }}/>
-                    <Tab.Screen name="FriendsStack" component={FriendsStack} options={{
+                    <Tab.Screen name="FriendshipStack" component={FriendshipStack} options={{
                         // headerShown: false,
-                        tabBarLabel: 'Friends',
+                        tabBarLabel: 'Friendship',
                         tabBarIcon: ({ color, size }) => (
                             <MaterialCommunityIcons name="account-group" color={color} size={size}/>
                         ),
