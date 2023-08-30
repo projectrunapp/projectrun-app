@@ -4,7 +4,13 @@ import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 
 interface AuthProps {
-    authState?: { token: string | null; authenticated: boolean | null },
+    authState?: {
+        authenticated: boolean,
+        token: string | null,
+        id: number | null,
+        name: string | null,
+        email: string | null,
+    },
     onRegister?: (email: string,
                   password: string,
                   username: string,
@@ -13,6 +19,7 @@ interface AuthProps {
                   gender: string) => Promise<any>,
     onLogin?: (email: string, password: string) => Promise<any>,
     onLogout?: () => Promise<any>,
+    authLoading?: boolean,
 }
 
 const AuthContext = createContext<AuthProps>({});
@@ -23,11 +30,17 @@ export const useAuth = () => {
 
 export const AuthProvider = ({children}: any) => {
     const [authState, setAuthState] = useState<{
+        authenticated: boolean,
         token: string | null,
-        authenticated: boolean | null,
+        id: number | null,
+        name: string | null,
+        email: string | null,
     }>({
+        authenticated: false,
         token: null,
-        authenticated: null,
+        id: null,
+        name: null,
+        email: null,
     });
     const [authLoading, setAuthLoading] = useState(true);
 
@@ -43,13 +56,19 @@ export const AuthProvider = ({children}: any) => {
                 }
             }
 
-            const token = response.data.data.access_token;
+            const userData = response.data.data;
             setAuthState({
-                token,
                 authenticated: true,
+                token: userData.token,
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
             });
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            await SecureStore.setItemAsync(process.env.JWT_KEY, token);
+
+            axios.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
+            // axios.defaults.headers.common['Content-Type'] = 'application/json';
+
+            await SecureStore.setItemAsync(process.env.JWT_KEY, userData.access_token);
             setAuthLoading(false);
 
             return response.data;
@@ -100,10 +119,14 @@ export const AuthProvider = ({children}: any) => {
         await SecureStore.deleteItemAsync(process.env.JWT_KEY);
 
         axios.defaults.headers.common['Authorization'] = '';
+        // axios.defaults.headers.common['Content-Type'] = 'application/json';
 
         setAuthState({
-            token: null,
             authenticated: false,
+            token: null,
+            id: null,
+            name: null,
+            email: null,
         });
     }
 
@@ -112,19 +135,14 @@ export const AuthProvider = ({children}: any) => {
         const token = await SecureStore.getItemAsync(process.env.JWT_KEY);
         if (token) {
             setAuthState({
-                token: token,
                 authenticated: true,
+                token: token,
+                id: null,
+                name: null,
+                email: null,
             });
         }
         setAuthLoading(false);
-    };
-
-    const value = {
-        onRegister: register,
-        onLogin: login,
-        onLogout: logout,
-        authState,
-        authLoading,
     };
 
     useEffect(() => {
@@ -132,7 +150,13 @@ export const AuthProvider = ({children}: any) => {
     }, [])
 
     return (
-        <AuthContext.Provider value={value}>
+        <AuthContext.Provider value={{
+            authState,
+            onRegister: register,
+            onLogin: login,
+            onLogout: logout,
+            authLoading,
+        }}>
             {children}
         </AuthContext.Provider>
     );

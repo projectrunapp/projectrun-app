@@ -1,16 +1,27 @@
 
-import {Button, Image, Platform, Pressable, StyleSheet, Text, TextInput, View, Keyboard} from "react-native";
+import {Image, Platform, Pressable, StyleSheet, Text, TextInput, View, TouchableOpacity} from "react-native";
 import {Picker} from '@react-native-picker/picker';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext";
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { genders } from "../utils/enums";
-import { splashLogoUrl } from "../utils/constants";
+import {
+    activeBtnTextColor,
+    appPrimaryColor,
+    appSecondaryColor,
+    inactiveBtnTextColor,
+    splashLogoUrl
+} from "../utils/app-constants";
+import Constants from 'expo-constants';
+import RNDateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker
 
 const AuthScreen = () => {
+    const [isLoginBtnActive, setIsLoginBtnActive] = useState<boolean>(false);
+    const [isRegisterBtnActive, setIsRegisterBtnActive] = useState<boolean>(false);
 
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
+    const [loginEmail, setLoginEmail] = useState<string>(process.env.DEV_USER_EMAIL || '');
+    const [loginPassword, setLoginPassword] = useState<string>(process.env.DEV_USER_PASSWORD || '');
+    const [registerEmail, setRegisterEmail] = useState<string>('');
+    const [registerPassword, setRegisterPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [name, setName] = useState<string>('');
     const [selectedGender, setSelectedGender] = useState<string>(genders[0].value);
@@ -26,7 +37,6 @@ const AuthScreen = () => {
         setShowDatePicker(Platform.OS === 'ios');
         setDate(currentDate);
         setBirthDate(dateFormat(currentDate));
-        Keyboard.dismiss();
     }
 
     const [showLogin, setShowLogin] = useState<boolean>(true);
@@ -34,96 +44,94 @@ const AuthScreen = () => {
     const {onLogin, onRegister} = useAuth();
 
     const pressLogin = async () => {
-        const result = await onLogin!(email, password);
+        const result = await onLogin!(loginEmail, loginPassword);
         if (result && result.error) {
             alert(result.message);
         }
     }
 
     const pressRegister = async () => {
-        const result = await onRegister!(email, password , username, name, birthDate, selectedGender);
+        const result = await onRegister!(registerEmail, registerPassword , username, name, birthDate, selectedGender);
         if (result && result.error) {
             alert(result.message);
         }
     }
 
+    useEffect(() => {
+        setIsLoginBtnActive(!!(loginEmail && loginPassword));
+    }, [loginEmail, loginPassword]);
+
+    useEffect(() => {
+        setIsRegisterBtnActive(!!(registerEmail && registerPassword && username && name && birthDate));
+    }, [registerEmail, registerPassword, username, name, birthDate]);
+
     return (
         <View style={styles.container}>
-            <Image source={{uri: splashLogoUrl}} style={styles.image} alt="Logo" />
+            <Image source={{uri: splashLogoUrl}} style={styles.image} alt="Logo"/>
             {showLogin ? (
                 <View style={styles.form}>
-                    <TextInput style={styles.input} placeholder="Email" onChangeText={(text: string) => setEmail(text)} value={email} />
-                    <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} onChangeText={(password: string) => setPassword(password)} value={password} />
+                    <TextInput style={styles.input} placeholder="Email"
+                               onChangeText={(currentText: string) => setLoginEmail(currentText)}
+                               value={loginEmail}/>
+                    <TextInput style={styles.input} placeholder="Password" secureTextEntry={true}
+                               onChangeText={(currentText: string) => setLoginPassword(currentText)}
+                               value={loginPassword}/>
 
-                    <Pressable style={styles.submit_btn} onPress={pressLogin}>
-                        <Text style={styles.submit_btn_text}>Login</Text>
+                    <Pressable style={[styles.submit_btn, {
+                        backgroundColor: isLoginBtnActive ? appPrimaryColor : '#ccc',
+                    }]} onPress={pressLogin}>
+                        <Text style={[styles.submit_btn_text, {
+                            color: isLoginBtnActive ? activeBtnTextColor : inactiveBtnTextColor,
+                        }]}>Login</Text>
                     </Pressable>
-                    <Text style={styles.btn_top_text}>Don't have an account?</Text>
-                    <Button styles={styles.navigate_btn} title="Register" className="btn" onPress={(e) => setShowLogin(false)} />
+
+                    <Text style={styles.navigate_text}>
+                        Don't have an account? <Text style={styles.navigate_link} onPress={(e) => setShowLogin(false)}>Register</Text>
+                    </Text>
                 </View>
             ) : (
                 <View style={styles.form}>
-
-                    <TextInput style={styles.input}
-                               placeholder="Email"
-                               onChangeText={(text: string) => setEmail(text)}
-                               value={email}
-                    />
-
-                    <TextInput style={styles.input}
-                               placeholder="Password"
-                               secureTextEntry={true}
-                               onChangeText={(password: string) => setPassword(password)}
-                               value={password}
-                    />
-
-                    <TextInput style={styles.input}
-                               placeholder="Username"
+                    <TextInput style={styles.input} placeholder="Email"
+                               onChangeText={(currentText: string) => setRegisterEmail(currentText)}
+                               value={registerEmail}/>
+                    <TextInput style={styles.input} placeholder="Password" secureTextEntry={true}
+                               onChangeText={(currentText: string) => setRegisterPassword(currentText)}
+                               value={registerPassword}/>
+                    <TextInput style={styles.input} placeholder="Username"
                                onChangeText={(text: string) => setUsername(text)}
-                               value={username}
-                    />
-
-                    <TextInput style={styles.input}
-                               placeholder="Name"
+                               value={username}/>
+                    <TextInput style={styles.input} placeholder="Name"
                                onChangeText={(text: string) => setName(text)}
-                               value={name}
-                    />
-
-                    <TextInput style={styles.input}
-                               placeholder="Birth Date"
-                               value={birthDate}
-                               onFocus={() => setShowDatePicker(true)}
-                    />
+                               value={name}/>
+                    <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                        <TextInput style={styles.input} placeholder="Birth Date" editable={false} value={birthDate}/>
+                    </TouchableOpacity>
                     {showDatePicker && (
-                        <DateTimePicker
-                            value={date}
-                            // mode={'date'}
-                            // display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                            // is24Hour={true}
-                            onChange={changeDate}
-                            style={styles.date_picker}
-                        />
+                        <RNDateTimePicker value={date} onChange={changeDate}/>
                     )}
+                    <View style={styles.picker_container}>
+                        <Picker onValueChange={(itemValue, itemIndex) => setSelectedGender(itemValue)}
+                                selectedValue={selectedGender}>
+                            {genders.map((option, index) => (
+                                <Picker.Item style={index === 0 ? {
+                                    color: '#9e9e9e',
+                                    fontSize: 14,
+                                } : {}} key={index} label={option.label} value={option.value}/>
+                            ))}
+                        </Picker>
+                    </View>
 
-                    <Picker onValueChange={(itemValue, itemIndex) => setSelectedGender(itemValue)}
-                            style={styles.input}
-                            selectedValue={selectedGender}>
-                        {genders.map(option => (
-                            <Picker.Item key={option.value} label={option.label} value={option.value} />
-                        ))}
-                    </Picker>
-
-                    <Pressable style={styles.submit_btn} onPress={pressRegister}>
-                        <Text style={styles.submit_btn_text}>Register</Text>
+                    <Pressable style={[styles.submit_btn, {
+                        backgroundColor: isRegisterBtnActive ? appPrimaryColor : '#ccc',
+                    }]} onPress={pressRegister}>
+                        <Text style={[styles.submit_btn_text, {
+                            color: isRegisterBtnActive ? activeBtnTextColor : inactiveBtnTextColor,
+                        }]}>Register</Text>
                     </Pressable>
 
-                    <Text style={styles.btn_top_text}>Already have an account?</Text>
-                    <Button styles={styles.navigate_btn}
-                            title="Login"
-                            className="btn"
-                            onPress={(e) => setShowLogin(true)}
-                    />
-
+                    <Text style={styles.navigate_text}>
+                        Already have an account? <Text style={styles.navigate_link} onPress={(e) => setShowLogin(true)}>Login</Text>
+                    </Text>
                 </View>
             )}
         </View>
@@ -145,15 +153,27 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 4,
         padding: 10,
+        color: '#000',
         backgroundColor: '#fff'
     },
+    picker_container: {
+        borderRadius: 4,
+        overflow: 'hidden',
+        backgroundColor: '#fff',
+        borderColor: '#000',
+        borderWidth: 1,
+        paddingVertical: 0,
+    },
     container: {
+        marginTop: Constants.statusBarHeight + 10,
         alignItems: 'center',
         width: '100%',
     },
-    navigate_btn: {
-        backgroundColor: '#098',
-        color: '#fff',
+    navigate_text: {
+        marginTop: 20,
+    },
+    navigate_link: {
+        color: appSecondaryColor,
     },
     submit_btn: {
         alignItems: 'center',
@@ -162,17 +182,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 32,
         borderRadius: 4,
         elevation: 3,
-        backgroundColor: '#F5F411',
     },
     submit_btn_text: {
         fontSize: 16,
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
-        color: '#fff',
-    },
-    btn_top_text: {
-        marginTop: 10,
     },
     date_picker: {
         width: 320,

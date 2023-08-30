@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { DataTable } from 'react-native-paper';
 import axios from "axios";
 import {useAuth} from "../context/AuthContext";
-import {paginationPerPages} from "../utils/constants";
+import {paginationPerPages} from "../utils/app-constants";
 import {useNavigation} from "@react-navigation/native";
 
 const RunsDataTable = () => {
@@ -25,6 +25,7 @@ const RunsDataTable = () => {
         const response = await axios.get(`${process.env.API_URL}/run/my-runs?page=${page + 1}&per_page=${perPage}`, {
             headers: {
                 Authorization: `Bearer ${authState!.token}`,
+                // "Content-Type": "application/json",
             }
         });
         if (response.data.success && response.data.data.runs) {

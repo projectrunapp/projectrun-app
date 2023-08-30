@@ -26,6 +26,8 @@ git clone git@gitlab.com:projectrun/projectrun-app.git projectrun-app && cd proj
 npm install
 ```
 
+- Get a Google Maps [API key](https://console.cloud.google.com/google/maps-apis/overview) and include it in the `.env` file (see `.env.example` file for reference).
+
 - Run the app:
 ```bash
 # for android
@@ -41,18 +43,19 @@ npm run android
 npm install -g eas-cli
 ```
 
-- Make sure to have "eas.json" file in the root directory of the project similar to the "eas.json.example" file
+- Make sure to have `eas.json` file in the root directory of the project similar to the `eas.example.json` file.
 
-- Make sure to have included all the environment variables written [here](https://docs.expo.dev/build-reference/variables/)
+- Make sure to have included all the environment variables written [here](https://docs.expo.dev/build-reference/variables/).
 
 - [Build APKs for Android Emulators and devices](https://docs.expo.dev/build-reference/apk/)
+
 ```bash
 eas build -p android --profile preview
 ```
 
 - Optional:
 ```bash
-# generate "eas.json" file
+# generate `eas.json` file
 eas build:configure
 
 # build for android
