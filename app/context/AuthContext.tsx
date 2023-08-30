@@ -66,7 +66,7 @@ export const AuthProvider = ({children}: any) => {
             });
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
-            axios.defaults.headers.common['Content-Type'] = 'application/json';
+            // axios.defaults.headers.common['Content-Type'] = 'application/json';
 
             await SecureStore.setItemAsync(process.env.JWT_KEY, userData.access_token);
             setAuthLoading(false);

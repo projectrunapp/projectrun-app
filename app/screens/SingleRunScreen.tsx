@@ -15,9 +15,9 @@ const SingleRunScreen = ({ route }: any) => {
     const loadRun = async (id: number) => {
         setLoading(true);
         const response = await axios.get(`${process.env.API_URL}/run/my-runs/${id}`, {
-            "headers": {
-                "Authorization": `Bearer ${authState!.token}`,
-                "Content-Type": "application/json",
+            headers: {
+                Authorization: `Bearer ${authState!.token}`,
+                // "Content-Type": "application/json",
             }
         });
         if (response.data.success && response.data.data) {

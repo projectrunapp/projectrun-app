@@ -9,6 +9,8 @@ import {appPrimaryColor} from "../utils/app-constants";
 const Tab = createMaterialTopTabNavigator();
 
 export default function FriendshipScreen() {
+    const [lastRefreshedTime, setLastRefreshedTime] = React.useState((new Date()).getTime());
+
     return (
         <Tab.Navigator screenOptions={{
             // tabBarShowIcon: false,
@@ -23,9 +25,15 @@ export default function FriendshipScreen() {
                 height: 4,
             },
         }}>
-            <Tab.Screen name="Friends" component={FriendsScreen} />
-            <Tab.Screen name="Received" component={ReceivedFriendRequestsScreen} />
-            <Tab.Screen name="Sent" component={SentFriendRequestsScreen} />
+            <Tab.Screen name="Friends" children={() => (
+                <FriendsScreen lastRefreshedTime={lastRefreshedTime}/>
+            )}/>
+            <Tab.Screen name="Received" children={() => (
+                <ReceivedFriendRequestsScreen setLastRefreshedTime={setLastRefreshedTime}/>
+            )}/>
+            <Tab.Screen name="Sent" component={SentFriendRequestsScreen}
+                        // initialParams={{lastRefreshedTime, setLastRefreshedTime}}
+            />
         </Tab.Navigator>
     );
 }
