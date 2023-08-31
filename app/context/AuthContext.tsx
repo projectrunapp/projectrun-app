@@ -45,8 +45,8 @@ export const AuthProvider = ({children}: any) => {
     const [authLoading, setAuthLoading] = useState(true);
 
     const login = async (email: string, password: string) => {
+        setAuthLoading(true);
         try {
-            setAuthLoading(true);
             const response = await axios.post(`${process.env.API_URL}/auth/login`, {email, password});
             if (!response.data.success) {
                 setAuthLoading(false);
@@ -59,7 +59,7 @@ export const AuthProvider = ({children}: any) => {
             const userData = response.data.data;
             setAuthState({
                 authenticated: true,
-                token: userData.token,
+                token: userData.access_token,
                 id: userData.id,
                 name: userData.name,
                 email: userData.email,
@@ -87,8 +87,8 @@ export const AuthProvider = ({children}: any) => {
                             name: string,
                             birth_date: string,
                             gender: string) => {
+        setAuthLoading(true);
         try {
-            setAuthLoading(true);
             const response = await axios.post(`${process.env.API_URL}/auth/register`, {
                 email,
                 password,

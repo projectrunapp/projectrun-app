@@ -1,5 +1,5 @@
 
-import {SafeAreaView, FlatList, StyleSheet, Text, View, ActivityIndicator} from "react-native";
+import {SafeAreaView, FlatList, StyleSheet, Text, View, ActivityIndicator, Alert} from "react-native";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext";
@@ -14,16 +14,22 @@ const FriendsScreen = ({lastRefreshedTime}) => {
 
     const loadFriends = async () => {
         setLoading(true);
-        const response = await axios.get(`${process.env.API_URL}/friendship/get-friends`, {
-            headers: {
-                Authorization: `Bearer ${authState!.token}`,
-                // "Content-Type": "application/json",
+        try {
+            const response = await axios.get(`${process.env.API_URL}/friendship/get-friends`, {
+                headers: {
+                    Authorization: `Bearer ${authState!.token}`,
+                    // "Content-Type": "application/json",
+                }
+            });
+            if (response.data.success && response.data.data) {
+                setFriends(response.data.data);
             }
-        });
-        if (response.data.success && response.data.data) {
-            setFriends(response.data.data);
+            setLoading(false);
+        } catch (err) {
+            // console.log(err.message);
+            setLoading(false);
+            Alert.alert('Error', 'Something went wrong!');
         }
-        setLoading(false);
     };
 
     const removeFriend = (friendshipId: number) => {
@@ -52,7 +58,7 @@ const FriendsScreen = ({lastRefreshedTime}) => {
             <FlatList
                 data={friends}
                 renderItem={({ item }) => {
-                    const friendUser = item.receiver.id === authState!.id ? item.receiver : item.sender;
+                    const friendUser = (item.receiver.id === authState!.id) ? item.sender : item.receiver;
                     return (<ListUserItem item={friendUser} actionButtons={
                         <UnfriendButton item={item} removeFriend={removeFriend} />
                     }/>);
