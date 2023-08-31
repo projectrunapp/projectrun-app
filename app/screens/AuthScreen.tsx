@@ -1,5 +1,15 @@
 
-import {Image, Platform, Pressable, StyleSheet, Text, TextInput, View, TouchableOpacity} from "react-native";
+import {
+    Image,
+    Platform,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+    TouchableOpacity,
+    ActivityIndicator
+} from "react-native";
 import {Picker} from '@react-native-picker/picker';
 import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext";
@@ -15,6 +25,7 @@ import Constants from 'expo-constants';
 import RNDateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker
 
 const AuthScreen = () => {
+    const [loading, setLoading] = useState<boolean>(false);
     const [isLoginBtnActive, setIsLoginBtnActive] = useState<boolean>(false);
     const [isRegisterBtnActive, setIsRegisterBtnActive] = useState<boolean>(false);
 
@@ -44,14 +55,24 @@ const AuthScreen = () => {
     const {onLogin, onRegister} = useAuth();
 
     const pressLogin = async () => {
+        if (!isLoginBtnActive) {
+            return;
+        }
+        setLoading(true);
         const result = await onLogin!(loginEmail, loginPassword);
+        setLoading(false);
         if (result && result.error) {
             alert(result.message);
         }
     }
 
     const pressRegister = async () => {
+        if (!isRegisterBtnActive) {
+            return;
+        }
+        setLoading(true);
         const result = await onRegister!(registerEmail, registerPassword , username, name, birthDate, selectedGender);
+        setLoading(false);
         if (result && result.error) {
             alert(result.message);
         }
@@ -64,6 +85,14 @@ const AuthScreen = () => {
     useEffect(() => {
         setIsRegisterBtnActive(!!(registerEmail && registerPassword && username && name && birthDate));
     }, [registerEmail, registerPassword, username, name, birthDate]);
+
+    if (loading) {
+        return (
+            <View style={[styles.loading_container, styles.loading_horizontal]}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -139,6 +168,15 @@ const AuthScreen = () => {
 };
 
 const styles = StyleSheet.create({
+    loading_container: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    loading_horizontal: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 10,
+    },
     image: {
         width: 100,
         height: 100,

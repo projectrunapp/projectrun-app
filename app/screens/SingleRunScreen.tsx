@@ -1,5 +1,5 @@
 
-import {ActivityIndicator, ScrollView, StyleSheet, Text, View} from "react-native";
+import {ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View} from "react-native";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext";
@@ -14,16 +14,22 @@ const SingleRunScreen = ({ route }: any) => {
 
     const loadRun = async (id: number) => {
         setLoading(true);
-        const response = await axios.get(`${process.env.API_URL}/run/my-runs/${id}`, {
-            headers: {
-                Authorization: `Bearer ${authState!.token}`,
-                // "Content-Type": "application/json",
+        try {
+            const response = await axios.get(`${process.env.API_URL}/run/my-runs/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${authState!.token}`,
+                    // "Content-Type": "application/json",
+                }
+            });
+            if (response.data.success && response.data.data) {
+                setRun(response.data.data);
             }
-        });
-        if (response.data.success && response.data.data) {
-            setRun(response.data.data);
+            setLoading(false);
+        } catch (err) {
+            // console.log(err.message);
+            setLoading(false);
+            Alert.alert('Error', 'Something went wrong!');
         }
-        setLoading(false);
     };
 
     useEffect(() => {

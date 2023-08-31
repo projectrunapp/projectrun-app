@@ -1,5 +1,5 @@
 
-import {SafeAreaView, FlatList, StyleSheet, Text, View, ActivityIndicator} from "react-native";
+import {SafeAreaView, FlatList, StyleSheet, Text, View, ActivityIndicator, Alert} from "react-native";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext";
@@ -13,16 +13,22 @@ const ReceivedFriendRequestsScreen = ({setLastRefreshedTime}) => {
 
     const loadReceivedFriendRequests = async () => {
         setLoading(true);
-        const response = await axios.get(`${process.env.API_URL}/friendship/get-friend-requests?filter=received`, {
-            headers: {
-                Authorization: `Bearer ${authState!.token}`,
-                // "Content-Type": "application/json",
+        try {
+            const response = await axios.get(`${process.env.API_URL}/friendship/get-friend-requests?filter=received`, {
+                headers: {
+                    Authorization: `Bearer ${authState!.token}`,
+                    // "Content-Type": "application/json",
+                }
+            });
+            if (response.data.success && response.data.data) {
+                setReceivedFriendRequests(response.data.data);
             }
-        });
-        if (response.data.success && response.data.data) {
-            setReceivedFriendRequests(response.data.data);
+            setLoading(false);
+        } catch (err) {
+            // console.log(err.message);
+            setLoading(false);
+            Alert.alert('Error', 'Something went wrong!');
         }
-        setLoading(false);
     };
 
     const removeFriendRequest = (friendshipId: number) => {

@@ -24,7 +24,7 @@ const UnfriendButton = ({ item, removeFriend }) => {
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong. Please try again!');
+            Alert.alert('Error', 'Something went wrong!');
         }
     };
 
@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        width: 100,
     },
     unfriend_button: {
         backgroundColor: 'red',

@@ -22,8 +22,8 @@ const ActionButtonsForReceivedFriendRequest = ({ item, removeFriendRequest }) =>
                 Alert.alert('Error', 'Something went wrong. Please try again!');
             }
         } catch (err) {
-            console.log(err.message);
-            Alert.alert('Error', 'Something went wrong. Please try again!');
+            // console.log(err.message);
+            Alert.alert('Error', 'Something went wrong!');
         }
     };
     const declineFriendRequest = async () => {
@@ -42,7 +42,7 @@ const ActionButtonsForReceivedFriendRequest = ({ item, removeFriendRequest }) =>
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong. Please try again!');
+            Alert.alert('Error', 'Something went wrong!');
         }
     };
 
@@ -98,12 +98,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        width: 100,
     },
     accept_button: {
         backgroundColor: 'green',
         borderRadius: 5,
         padding: 5,
+        marginRight: 5,
     },
     decline_button: {
         backgroundColor: 'red',

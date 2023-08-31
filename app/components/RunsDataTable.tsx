@@ -5,6 +5,7 @@ import axios from "axios";
 import {useAuth} from "../context/AuthContext";
 import {paginationPerPages} from "../utils/app-constants";
 import {useNavigation} from "@react-navigation/native";
+import {Alert} from "react-native";
 
 const RunsDataTable = () => {
     const navigation = useNavigation();
@@ -22,17 +23,23 @@ const RunsDataTable = () => {
 
     const loadRuns = async () => {
         setLoading(true);
-        const response = await axios.get(`${process.env.API_URL}/run/my-runs?page=${page + 1}&per_page=${perPage}`, {
-            headers: {
-                Authorization: `Bearer ${authState!.token}`,
-                // "Content-Type": "application/json",
+        try {
+            const response = await axios.get(`${process.env.API_URL}/run/my-runs?page=${page + 1}&per_page=${perPage}`, {
+                headers: {
+                    Authorization: `Bearer ${authState!.token}`,
+                    // "Content-Type": "application/json",
+                }
+            });
+            if (response.data.success && response.data.data.runs) {
+                setRuns(response.data.data.runs);
+                setTotal(response.data.data.total);
             }
-        });
-        if (response.data.success && response.data.data.runs) {
-            setRuns(response.data.data.runs);
-            setTotal(response.data.data.total);
+            setLoading(false);
+        } catch (err) {
+            // console.log(err.message);
+            setLoading(false);
+            Alert.alert('Error', 'Something went wrong!');
         }
-        setLoading(false);
     };
 
     useEffect(() => {
@@ -51,12 +58,18 @@ const RunsDataTable = () => {
                         <DataTable.Cell>Loading...</DataTable.Cell>
                     </DataTable.Row>
                 ) : (
-                    runs.map((run, index) => (
-                        <DataTable.Row key={index} onPress={() => navigateToSingleRun(run.id, run.title)}>
-                            <DataTable.Cell>{run.id}</DataTable.Cell>
-                            <DataTable.Cell>{run.title}</DataTable.Cell>
+                    total === 0 ? (
+                        <DataTable.Row>
+                            <DataTable.Cell>No runs yet :(</DataTable.Cell>
                         </DataTable.Row>
-                    ))
+                    ) : (
+                        runs.map((run, index) => (
+                            <DataTable.Row key={index} onPress={() => navigateToSingleRun(run.id, run.title)}>
+                                <DataTable.Cell>{run.id}</DataTable.Cell>
+                                <DataTable.Cell>{run.title}</DataTable.Cell>
+                            </DataTable.Row>
+                        ))
+                    )
                 )
             }
             <DataTable.Pagination
