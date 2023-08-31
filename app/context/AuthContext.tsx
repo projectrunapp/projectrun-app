@@ -19,7 +19,6 @@ interface AuthProps {
                   gender: string) => Promise<any>,
     onLogin?: (email: string, password: string) => Promise<any>,
     onLogout?: () => Promise<any>,
-    authLoading?: boolean,
 }
 
 const AuthContext = createContext<AuthProps>({});
@@ -42,14 +41,11 @@ export const AuthProvider = ({children}: any) => {
         name: null,
         email: null,
     });
-    const [authLoading, setAuthLoading] = useState(true);
 
     const login = async (email: string, password: string) => {
-        setAuthLoading(true);
         try {
             const response = await axios.post(`${process.env.API_URL}/auth/login`, {email, password});
             if (!response.data.success) {
-                setAuthLoading(false);
                 return {
                     error: true,
                     message: response.data.message,
@@ -69,11 +65,9 @@ export const AuthProvider = ({children}: any) => {
             // axios.defaults.headers.common['Content-Type'] = 'application/json';
 
             await SecureStore.setItemAsync(process.env.JWT_KEY, userData.access_token);
-            setAuthLoading(false);
 
             return response.data;
         } catch (e) {
-            setAuthLoading(false);
             return {
                 error: true,
                 message: (e as any).response.data.message,
@@ -87,7 +81,6 @@ export const AuthProvider = ({children}: any) => {
                             name: string,
                             birth_date: string,
                             gender: string) => {
-        setAuthLoading(true);
         try {
             const response = await axios.post(`${process.env.API_URL}/auth/register`, {
                 email,
@@ -97,7 +90,6 @@ export const AuthProvider = ({children}: any) => {
                 birth_date,
                 gender
             });
-            setAuthLoading(false);
             
             if (!response.data.success) {
                 return {
@@ -131,7 +123,6 @@ export const AuthProvider = ({children}: any) => {
     }
 
     const loadToken = async () => {
-        setAuthLoading(true);
         const token = await SecureStore.getItemAsync(process.env.JWT_KEY);
         if (token) {
             setAuthState({
@@ -142,7 +133,6 @@ export const AuthProvider = ({children}: any) => {
                 email: null,
             });
         }
-        setAuthLoading(false);
     };
 
     useEffect(() => {
@@ -155,7 +145,6 @@ export const AuthProvider = ({children}: any) => {
             onRegister: register,
             onLogin: login,
             onLogout: logout,
-            authLoading,
         }}>
             {children}
         </AuthContext.Provider>
