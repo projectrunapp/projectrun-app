@@ -7,10 +7,19 @@ import ListUserItem from "./ListUserItem";
 import UnfriendButton from "./UnfriendButton";
 
 const FriendsScreen = ({lastRefreshedTime}) => {
-    const { authState } = useAuth();
+    const { authState, getStorageUser } = useAuth();
+    const [authUserId, setAuthUserId] = useState<number | null>(null);
+
     const [loading, setLoading] = useState(true);
     // TODO: fade in/out animation when adding/removing friends
     const [friends, setFriends] = useState<any>({});
+
+    const getUserId = async () => {
+        if (getStorageUser) {
+            const {storageUserId} = await getStorageUser();
+            setAuthUserId(storageUserId);
+        }
+    };
 
     const loadFriends = async () => {
         setLoading(true);
@@ -39,12 +48,15 @@ const FriendsScreen = ({lastRefreshedTime}) => {
     }
 
     useEffect(() => {
-        loadFriends();
+        getUserId().then(() => {
+            loadFriends();
+        });
     }, [
         lastRefreshedTime,
         // friends.length, // we won't need this because after unfriending it will be appropriate
     ]);
 
+    // authUserId already set before loadFriends() is called
     if (loading) {
         return (
             <View style={[styles.loading_container, styles.loading_horizontal]}>
@@ -58,7 +70,7 @@ const FriendsScreen = ({lastRefreshedTime}) => {
             <FlatList
                 data={friends}
                 renderItem={({ item }) => {
-                    const friendUser = (item.receiver.id === authState!.id) ? item.sender : item.receiver;
+                    const friendUser = (item.receiver.id === authUserId) ? item.sender : item.receiver;
                     return (<ListUserItem item={friendUser} actionButtons={
                         <UnfriendButton item={item} removeFriend={removeFriend} />
                     }/>);
