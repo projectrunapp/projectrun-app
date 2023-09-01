@@ -6,9 +6,13 @@ const RunStack = () => {
     const Stack = createNativeStackNavigator();
 
     return (
-        <Stack.Navigator initialRouteName="Run" screenOptions={{headerShown: false}}>
-            <Stack.Screen name="Run" component={RunScreen}
-                          options={{ title: 'Run Page' }}/>
+        <Stack.Navigator initialRouteName="RunScreen" screenOptions={{
+            headerShown: false,
+        }}>
+            <Stack.Screen name="RunScreen" component={RunScreen} options={{
+                // headerShown: true,
+                title: 'Run Page',
+            }}/>
         </Stack.Navigator>
     );
 }
