@@ -7,12 +7,25 @@ import {Searchbar} from "react-native-paper";
 import ListUserItem from "./Friendship/ListUserItem";
 import ActionButtonsForSearchedUser from "./Friendship/ActionButtonsForSearchedUser";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
+import PopupMessage from "../components/PopupMessage";
 
 const SearchScreen = () => {
     const { authState } = useAuth();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [query, setQuery] = useState('');
+
+    const [isPopupVisible, setPopupVisible] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const [popupSuccess, setPopupSuccess] = useState<boolean>(true);
+    const showPopup = (success: boolean, message: string) => {
+        setPopupMessage(message);
+        setPopupSuccess(success);
+        setPopupVisible(true);
+    }
+    const closePopup = () => {
+        setPopupVisible(false); // setPopupMessage(""); setPopupSuccess(true);
+    }
 
     const searchUsers = async (query) => {
         setQuery(query);
@@ -44,6 +57,7 @@ const SearchScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <PopupMessage isVisible={isPopupVisible} message={popupMessage} success={popupSuccess} onClose={closePopup}/>
             <Searchbar
                 placeholder="Search users..."
                 onChangeText={searchUsers}
@@ -58,7 +72,7 @@ const SearchScreen = () => {
                     data={users}
                     renderItem={({ item }) => {
                         return (<ListUserItem item={item} actionButtons={
-                            <ActionButtonsForSearchedUser item={item}/>
+                            <ActionButtonsForSearchedUser item={item} showPopup={showPopup}/>
                         }/>);
                     }}
                     keyExtractor={(user) => user.id}

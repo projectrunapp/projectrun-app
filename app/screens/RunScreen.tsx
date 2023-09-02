@@ -7,14 +7,34 @@ import {
     stopRunBtnPressSeconds,
     startRunBtnPressSeconds, guaranteeSecondsAfterStartBtnPress
 } from "../utils/app-constants";
+import {useState} from "react";
+import PopupMessage from "../components/PopupMessage";
 
 const RunScreen = ({ route, navigation }) => {
+    const [isPopupVisible, setPopupVisible] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const [popupSuccess, setPopupSuccess] = useState<boolean>(true);
+    const showPopup = (success: boolean, message: string) => {
+        setPopupMessage(message);
+        setPopupSuccess(success);
+        setPopupVisible(true);
+    }
+    const closePopup = () => {
+        setPopupVisible(false); // setPopupMessage(""); setPopupSuccess(true);
+    }
+
     const [runState, setRunState] = React.useState<number>(runStates.NOT_STARTED);
     const [runStartedAt, setRunStartedAt] = React.useState<number>(0);
     const runAction = () => {
         // check that the "Pause" ("Resume") button hasn't pressed automatically after holding the "Start" button
         if (runStartedAt !== 0 && Date.now() - runStartedAt >= guaranteeSecondsAfterStartBtnPress * 1000) {
-            runState === runStates.RUNNING ? setRunState(runStates.PAUSED) : setRunState(runStates.RUNNING);
+            if (runState === runStates.RUNNING) {
+                showPopup(true, "Run paused.");
+                setRunState(runStates.PAUSED);
+            } else { // runState === runStates.PAUSED
+                showPopup(true, "Run resumed.");
+                setRunState(runStates.RUNNING);
+            }
         }
     };
 
@@ -26,7 +46,7 @@ const RunScreen = ({ route, navigation }) => {
 
         this.intervalForStop = setInterval(() => {
             if (Math.floor((Date.now() - this.stopBtnPressedInTime) / 1000) >= stopRunBtnPressSeconds) {
-                // console.log("Run stopped.");
+                showPopup(true, "Run stopped.");
                 setStopCountdownSeconds(stopRunBtnPressSeconds);
 
                 clearInterval(this.intervalForStop);
@@ -42,7 +62,7 @@ const RunScreen = ({ route, navigation }) => {
         }, 1000);
     };
     const handleStopBtnPressOut = () => {
-        // console.log("Run resumed.");
+        showPopup(false, "Run wasn't stopped!");
         setStopCountdownSeconds(stopRunBtnPressSeconds);
 
         clearInterval(this.intervalForStop);
@@ -50,7 +70,7 @@ const RunScreen = ({ route, navigation }) => {
         setIsStopBtnPressed(false);
     };
 
-    const [startCountdownSeconds, setStartCountdownSeconds] = React.useState(startRunBtnPressSeconds); // 3
+    const [startCountdownSeconds, setStartCountdownSeconds] = React.useState(startRunBtnPressSeconds);
     const [isStartBtnPressed, setIsStartBtnPressed] = React.useState(false);
     const handleStartBtnPressIn = () => {
         setIsStartBtnPressed(true);
@@ -58,7 +78,7 @@ const RunScreen = ({ route, navigation }) => {
 
         this.intervalForStart = setInterval(() => {
             if (Math.floor((Date.now() - this.startBtnPressedInTime) / 1000) >= startRunBtnPressSeconds) {
-                // console.log("Run started.");
+                showPopup(true, "Run started.");
                 setStartCountdownSeconds(startRunBtnPressSeconds);
 
                 clearInterval(this.intervalForStart);
@@ -75,7 +95,7 @@ const RunScreen = ({ route, navigation }) => {
         }, 1000);
     };
     const handleStartBtnPressOut = () => {
-        // console.log("Didn't start.");
+        showPopup(false, "Run wasn't started!");
         setStartCountdownSeconds(startRunBtnPressSeconds);
 
         clearInterval(this.intervalForStart);
@@ -85,6 +105,7 @@ const RunScreen = ({ route, navigation }) => {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
+            <PopupMessage isVisible={isPopupVisible} message={popupMessage} success={popupSuccess} onClose={closePopup}/>
             <View style={{ flex: 1, padding: 16 }}>
                 <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
 

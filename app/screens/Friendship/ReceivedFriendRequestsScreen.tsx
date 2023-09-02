@@ -1,17 +1,30 @@
 
 import {SafeAreaView, FlatList, StyleSheet, Text, View, ActivityIndicator, Alert} from "react-native";
 import axios from "axios";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext";
 import ListUserItem from "./ListUserItem";
 import ActionButtonsForReceivedFriendRequest from "./ActionButtonsForReceivedFriendRequest";
 import {useFriendshipRefresh} from "../../context/FriendshipRefreshContext";
+import PopupMessage from "../../components/PopupMessage";
 
 const ReceivedFriendRequestsScreen = () => {
     const { receivedFriendRequestsLastRefreshedTime, updateFriendsLastRefreshedTime } = useFriendshipRefresh();
     const { authState } = useAuth();
     const [loading, setLoading] = useState(true);
     const [receivedFriendRequests, setReceivedFriendRequests] = useState<any>({});
+
+    const [isPopupVisible, setPopupVisible] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const [popupSuccess, setPopupSuccess] = useState<boolean>(true);
+    const showPopup = (success: boolean, message: string) => {
+        setPopupMessage(message);
+        setPopupSuccess(success);
+        setPopupVisible(true);
+    }
+    const closePopup = () => {
+        setPopupVisible(false); // setPopupMessage(""); setPopupSuccess(true);
+    }
 
     const loadReceivedFriendRequests = async () => {
         setLoading(true);
@@ -58,11 +71,12 @@ const ReceivedFriendRequestsScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <PopupMessage isVisible={isPopupVisible} message={popupMessage} success={popupSuccess} onClose={closePopup}/>
             <FlatList
                 data={receivedFriendRequests}
                 renderItem={({ item }) => {
                     return (<ListUserItem item={item.sender} actionButtons={
-                        <ActionButtonsForReceivedFriendRequest item={item} removeFriendRequest={removeFriendRequest} />
+                        <ActionButtonsForReceivedFriendRequest item={item} removeFriendRequest={removeFriendRequest} showPopup={showPopup} />
                     }/>);
                 }}
                 keyExtractor={(item) => item.id}

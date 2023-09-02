@@ -1,16 +1,29 @@
 
 import {SafeAreaView, FlatList, StyleSheet, Text, View, ActivityIndicator, Alert} from "react-native";
 import axios from "axios";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext";
 import ListUserItem from "./ListUserItem";
 import UnfriendButton from "./UnfriendButton";
 import {useFriendshipRefresh} from "../../context/FriendshipRefreshContext";
+import PopupMessage from "../../components/PopupMessage";
 
 const FriendsScreen = () => {
     const { friendsLastRefreshedTime } = useFriendshipRefresh();
     const { authState, getStorageUser } = useAuth();
     const [authUserId, setAuthUserId] = useState<number | null>(null);
+
+    const [isPopupVisible, setPopupVisible] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const [popupSuccess, setPopupSuccess] = useState<boolean>(true);
+    const showPopup = (success: boolean, message: string) => {
+        setPopupMessage(message);
+        setPopupSuccess(success);
+        setPopupVisible(true);
+    }
+    const closePopup = () => {
+        setPopupVisible(false); // setPopupMessage(""); setPopupSuccess(true);
+    }
 
     const [loading, setLoading] = useState(true);
     // TODO: fade in/out animation when adding/removing friends
@@ -69,12 +82,13 @@ const FriendsScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <PopupMessage isVisible={isPopupVisible} message={popupMessage} success={popupSuccess} onClose={closePopup}/>
             <FlatList
                 data={friends}
                 renderItem={({ item }) => {
                     const friendUser = (item.receiver.id === authUserId) ? item.sender : item.receiver;
                     return (<ListUserItem item={friendUser} actionButtons={
-                        <UnfriendButton item={item} removeFriend={removeFriend} />
+                        <UnfriendButton item={item} removeFriend={removeFriend} showPopup={showPopup} />
                     }/>);
                 }}
                 keyExtractor={(item) => item.id}

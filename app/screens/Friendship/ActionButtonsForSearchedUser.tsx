@@ -6,15 +6,16 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {useState} from "react";
 import {useFriendshipRefresh} from "../../context/FriendshipRefreshContext";
 
-const ActionButtonsForSearchedUser = ({item}) => {
+const ActionButtonsForSearchedUser = ({item, showPopup}) => {
     const {
         updateFriendsLastRefreshedTime,
         updateReceivedFriendRequestsLastRefreshedTime,
         updateSentFriendRequestsLastRefreshedTime
     } = useFriendshipRefresh();
+
     const { authState } = useAuth();
-    // 'default', 'friends', 'friend_request_sent', 'friend_request_received', 'none'
-    const [friendship, setFriendship] = useState('default');
+
+    const [friendship, setFriendship] = useState('default'); // 'default', 'friends', 'friend_request_sent', 'friend_request_received', 'none'
 
     const acceptFriendRequest = async () => {
         try {
@@ -27,12 +28,13 @@ const ActionButtonsForSearchedUser = ({item}) => {
             if (response.data.success) {
                 setFriendship('friends');
                 updateFriendsLastRefreshedTime(); // trigger useEffect in FriendsScreen.tsx
+                showPopup(true, "Friend request accepted.");
             } else {
-                Alert.alert('Error', 'Something went wrong. Please try again!');
+                showPopup(false, "Something went wrong. Please try again!");
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong!');
+            showPopup(false, "Something went wrong!");
         }
     };
     const declineFriendRequest = async () => {
@@ -46,12 +48,13 @@ const ActionButtonsForSearchedUser = ({item}) => {
             if (response.data.success) {
                 setFriendship('none');
                 updateReceivedFriendRequestsLastRefreshedTime(); // trigger useEffect in ReceivedFriendRequestsScreen.tsx
+                showPopup(true, "Friend request declined.");
             } else {
-                Alert.alert('Error', 'Something went wrong. Please try again!');
+                showPopup(false, "Something went wrong. Please try again!");
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong!');
+            showPopup(false, "Something went wrong!");
         }
     };
     const cancelFriendRequest = async () => {
@@ -65,12 +68,13 @@ const ActionButtonsForSearchedUser = ({item}) => {
             if (response.data.success) {
                 setFriendship('none');
                 updateSentFriendRequestsLastRefreshedTime(); // trigger useEffect in SentFriendRequestsScreen.tsx
+                showPopup(true, "Friend request cancelled.");
             } else {
-                Alert.alert('Error', 'Something went wrong. Please try again!');
+                showPopup(false, "Something went wrong. Please try again!");
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong. Please try again!');
+            showPopup(false, "Something went wrong!");
         }
     };
     const unfriend = async () => {
@@ -84,12 +88,13 @@ const ActionButtonsForSearchedUser = ({item}) => {
             if (response.data.success) {
                 setFriendship('none');
                 updateFriendsLastRefreshedTime(); // trigger useEffect in FriendsScreen.tsx
+                showPopup(true, "Unfriended.");
             } else {
-                Alert.alert('Error', 'Something went wrong. Please try again!');
+                showPopup(false, "Something went wrong. Please try again!");
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong!');
+            showPopup(false, "Something went wrong!");
         }
     };
     const sendFriendRequest = async () => {
@@ -103,12 +108,13 @@ const ActionButtonsForSearchedUser = ({item}) => {
             if (response.data.success) {
                 setFriendship('friend_request_sent');
                 updateSentFriendRequestsLastRefreshedTime(); // trigger useEffect in SentFriendRequestsScreen.tsx
+                showPopup(true, "Friend request sent.");
             } else {
-                Alert.alert('Error', 'Something went wrong. Please try again!');
+                showPopup(false, "Something went wrong. Please try again!");
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong!');
+            showPopup(false, "Something went wrong!");
         }
     };
 
