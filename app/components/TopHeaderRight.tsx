@@ -8,11 +8,11 @@ export default function TopHeaderRight() {
     const navigation = useNavigation();
 
     const pressSearch = () => {
-        navigation.navigate("SearchScreen");
+        navigation.navigate("Friendship", {screen: "SearchScreen"});
     }
 
     const pressProfile = () => {
-        navigation.navigate("ProfileScreen");
+        navigation.navigate("Home", {screen: "ProfileScreen"});
     }
 
     return (

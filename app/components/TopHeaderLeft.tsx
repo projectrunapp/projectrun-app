@@ -6,7 +6,7 @@ export default function TopHeaderLeft() {
     const navigation = useNavigation();
 
     const pressLogo = () => {
-        navigation.navigate("HomeScreen");
+        navigation.navigate("Home", {screen: "HomeScreen"});
     };
 
     return (

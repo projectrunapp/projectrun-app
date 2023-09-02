@@ -5,8 +5,10 @@ import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext";
 import ListUserItem from "./ListUserItem";
 import ActionButtonsForReceivedFriendRequest from "./ActionButtonsForReceivedFriendRequest";
+import {useFriendshipRefresh} from "../../context/FriendshipRefreshContext";
 
-const ReceivedFriendRequestsScreen = ({setLastRefreshedTime}) => {
+const ReceivedFriendRequestsScreen = () => {
+    const { receivedFriendRequestsLastRefreshedTime, updateFriendsLastRefreshedTime } = useFriendshipRefresh();
     const { authState } = useAuth();
     const [loading, setLoading] = useState(true);
     const [receivedFriendRequests, setReceivedFriendRequests] = useState<any>({});
@@ -31,16 +33,20 @@ const ReceivedFriendRequestsScreen = ({setLastRefreshedTime}) => {
         }
     };
 
-    const removeFriendRequest = (friendshipId: number) => {
+    const removeFriendRequest = (friendshipId: number, isFriendRequestAccepted: boolean) => {
         setReceivedFriendRequests(prevState => {
             return prevState.filter((friendship: any) => friendship.id !== friendshipId);
         });
-        setLastRefreshedTime((new Date()).getTime()); // trigger useEffect in FriendsScreen.tsx
+        if (isFriendRequestAccepted) {
+            updateFriendsLastRefreshedTime(); // trigger useEffect in FriendsScreen.tsx
+        }
     }
 
     useEffect(() => {
         loadReceivedFriendRequests();
-    }, []);
+    }, [
+        receivedFriendRequestsLastRefreshedTime,
+    ]);
 
     if (loading) {
         return (

@@ -17,7 +17,7 @@ const ActionButtonsForReceivedFriendRequest = ({ item, removeFriendRequest }) =>
             });
             if (response.data.success) {
                 // Alert.alert('Success', 'You have accepted the friend request.');
-                removeFriendRequest(item.id); // response.data.data
+                removeFriendRequest(item.id, true); // response.data.data
             } else {
                 Alert.alert('Error', 'Something went wrong. Please try again!');
             }
@@ -36,7 +36,7 @@ const ActionButtonsForReceivedFriendRequest = ({ item, removeFriendRequest }) =>
             });
             if (response.data.success) {
                 // Alert.alert('Success', 'You have declined the friend request.');
-                removeFriendRequest(item.id); // response.data.data
+                removeFriendRequest(item.id, false); // response.data.data
             } else {
                 Alert.alert('Error', 'Something went wrong. Please try again!');
             }

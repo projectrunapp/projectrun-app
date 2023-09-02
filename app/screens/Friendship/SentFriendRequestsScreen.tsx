@@ -5,8 +5,10 @@ import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext";
 import ListUserItem from "./ListUserItem";
 import CancelButtonForSentFriendRequest from "./CancelButtonForSentFriendRequest";
+import {useFriendshipRefresh} from "../../context/FriendshipRefreshContext";
 
 const SentFriendRequestsScreen = () => {
+    const { sentFriendRequestsLastRefreshedTime } = useFriendshipRefresh();
     const { authState } = useAuth();
     const [loading, setLoading] = useState(true);
     const [sentFriendRequests, setSentFriendRequests] = useState<any>({});
@@ -35,11 +37,14 @@ const SentFriendRequestsScreen = () => {
         setSentFriendRequests(prevState => {
             return prevState.filter((friendship: any) => friendship.id !== friendshipId);
         });
+        // trigger: nothing to trigger
     }
 
     useEffect(() => {
         loadSentFriendRequests();
-    }, []);
+    }, [
+        sentFriendRequestsLastRefreshedTime,
+    ]);
 
     if (loading) {
         return (

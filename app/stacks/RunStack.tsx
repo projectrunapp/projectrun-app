@@ -1,6 +1,7 @@
 
 import RunScreen from "../screens/RunScreen";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import SingleRunScreen from "../screens/SingleRunScreen";
 
 const RunStack = () => {
     const Stack = createNativeStackNavigator();
@@ -13,6 +14,9 @@ const RunStack = () => {
                 // headerShown: true,
                 title: 'Run Page',
             }}/>
+            <Stack.Screen name="SingleRunScreen" component={SingleRunScreen} options={
+                ({ route }) => ({ title: route.params.title })
+            }></Stack.Screen>
         </Stack.Navigator>
     );
 }

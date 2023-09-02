@@ -5,8 +5,10 @@ import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext";
 import ListUserItem from "./ListUserItem";
 import UnfriendButton from "./UnfriendButton";
+import {useFriendshipRefresh} from "../../context/FriendshipRefreshContext";
 
-const FriendsScreen = ({lastRefreshedTime}) => {
+const FriendsScreen = () => {
+    const { friendsLastRefreshedTime } = useFriendshipRefresh();
     const { authState, getStorageUser } = useAuth();
     const [authUserId, setAuthUserId] = useState<number | null>(null);
 
@@ -52,7 +54,7 @@ const FriendsScreen = ({lastRefreshedTime}) => {
             loadFriends();
         });
     }, [
-        lastRefreshedTime,
+        friendsLastRefreshedTime,
         // friends.length, // we won't need this because after unfriending it will be appropriate
     ]);
 

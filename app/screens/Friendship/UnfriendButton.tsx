@@ -49,7 +49,7 @@ const UnfriendButton = ({ item, removeFriend }) => {
     return (
         <View style={styles.action_buttons_container}>
             <TouchableOpacity style={styles.unfriend_button} onPress={() => onPressUnfriend()}>
-                <MaterialCommunityIcons name="close" size={24} style={{color: 'white'}}/>
+                <MaterialCommunityIcons name="account-remove" size={24} style={{color: 'white'}}/>
             </TouchableOpacity>
         </View>
     );

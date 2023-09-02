@@ -18,7 +18,7 @@ const RunsDataTable = () => {
     const [perPage, setPerPage] = useState(paginationPerPages[0]); // 10
 
     const navigateToSingleRun = (runId: number, title: string) => {
-        navigation.navigate('SingleRunScreen', { runId, title });
+        navigation.navigate("Run", { screen: "SingleRunScreen", params: { runId, title } });
     };
 
     const loadRuns = async () => {
