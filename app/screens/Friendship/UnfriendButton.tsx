@@ -4,7 +4,7 @@ import {Alert, StyleSheet, TouchableOpacity, View} from "react-native";
 import {useAuth} from "../../context/AuthContext";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
-const UnfriendButton = ({ item, removeFriend }) => {
+const UnfriendButton = ({ item, showPopup, removeFriend }) => {
     const { authState } = useAuth();
 
     const unfriend = async () => {
@@ -17,14 +17,14 @@ const UnfriendButton = ({ item, removeFriend }) => {
                 }
             });
             if (response.data.success) {
-                // Alert.alert('Success', 'You did unfriend.');
+                showPopup(true, "Unfriended.");
                 removeFriend(item.id); // response.data.data
             } else {
-                Alert.alert('Error', 'Something went wrong. Please try again!');
+                showPopup(false, "Something went wrong. Please try again!");
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong!');
+            showPopup(false, "Something went wrong!");
         }
     };
 
@@ -49,7 +49,7 @@ const UnfriendButton = ({ item, removeFriend }) => {
     return (
         <View style={styles.action_buttons_container}>
             <TouchableOpacity style={styles.unfriend_button} onPress={() => onPressUnfriend()}>
-                <MaterialCommunityIcons name="close" size={24} style={{color: 'white'}}/>
+                <MaterialCommunityIcons name="account-remove" size={24} style={{color: 'white'}}/>
             </TouchableOpacity>
         </View>
     );

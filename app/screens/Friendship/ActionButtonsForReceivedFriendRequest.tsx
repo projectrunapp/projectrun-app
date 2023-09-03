@@ -4,7 +4,7 @@ import {Alert, StyleSheet, TouchableOpacity, View} from "react-native";
 import {useAuth} from "../../context/AuthContext";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
-const ActionButtonsForReceivedFriendRequest = ({ item, removeFriendRequest }) => {
+const ActionButtonsForReceivedFriendRequest = ({ item, showPopup, removeFriendRequest }) => {
     const { authState } = useAuth();
 
     const acceptFriendRequest = async () => {
@@ -16,14 +16,14 @@ const ActionButtonsForReceivedFriendRequest = ({ item, removeFriendRequest }) =>
                 }
             });
             if (response.data.success) {
-                // Alert.alert('Success', 'You have accepted the friend request.');
-                removeFriendRequest(item.id); // response.data.data
+                showPopup(true, "You have accepted the friend request.");
+                removeFriendRequest(item.id, true); // response.data.data
             } else {
-                Alert.alert('Error', 'Something went wrong. Please try again!');
+                showPopup(false, "Something went wrong. Please try again!");
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong!');
+            showPopup(false, "Something went wrong!");
         }
     };
     const declineFriendRequest = async () => {
@@ -35,14 +35,14 @@ const ActionButtonsForReceivedFriendRequest = ({ item, removeFriendRequest }) =>
                 }
             });
             if (response.data.success) {
-                // Alert.alert('Success', 'You have declined the friend request.');
-                removeFriendRequest(item.id); // response.data.data
+                showPopup(true, "You have declined the friend request.");
+                removeFriendRequest(item.id, false); // response.data.data
             } else {
-                Alert.alert('Error', 'Something went wrong. Please try again!');
+                showPopup(false, "Something went wrong. Please try again!");
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong!');
+            showPopup(false, "Something went wrong!");
         }
     };
 

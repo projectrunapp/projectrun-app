@@ -1,0 +1,45 @@
+
+import {Image, StyleSheet, TouchableOpacity, View} from "react-native";
+import {MaterialCommunityIcons} from "@expo/vector-icons";
+import {useNavigation} from "@react-navigation/native";
+import {userDefaultAvatarUrl} from "../utils/app-constants";
+
+export default function TopHeaderRight() {
+    const navigation = useNavigation();
+
+    const pressSearch = () => {
+        navigation.navigate("Friendship", {screen: "SearchScreen"});
+    }
+
+    const pressProfile = () => {
+        navigation.navigate("Home", {screen: "ProfileScreen"});
+    }
+
+    return (
+        <View style={styles.container}>
+            <TouchableOpacity onPress={pressSearch} style={styles.searchIcon}>
+                <MaterialCommunityIcons name="magnify" size={30} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={pressProfile} style={styles.profileIcon}>
+                <Image source={{uri: userDefaultAvatarUrl}} style={styles.avatar} />
+            </TouchableOpacity>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: "row",
+    },
+    searchIcon: {
+        marginRight: 10,
+    },
+    profileIcon: {
+        marginRight: 10,
+    },
+    avatar: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+    },
+});

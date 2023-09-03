@@ -4,7 +4,7 @@ import {Alert, StyleSheet, TouchableOpacity, View} from "react-native";
 import {useAuth} from "../../context/AuthContext";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
-const CancelButtonForSentFriendRequest = ({ item, removeFriendRequest }) => {
+const CancelButtonForSentFriendRequest = ({ item, showPopup, removeFriendRequest }) => {
     const { authState } = useAuth();
 
     const cancelFriendRequest = async () => {
@@ -16,14 +16,14 @@ const CancelButtonForSentFriendRequest = ({ item, removeFriendRequest }) => {
                 }
             });
             if (response.data.success) {
-                // Alert.alert('Success', 'You canceled the friend request.');
+                showPopup(true, "You canceled the friend request.");
                 removeFriendRequest(item.id); // response.data.data
             } else {
-                Alert.alert('Error', 'Something went wrong. Please try again!');
+                showPopup(false, "Something went wrong. Please try again!");
             }
         } catch (err) {
             // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong. Please try again!');
+            showPopup(false, "Something went wrong!");
         }
     };
 
