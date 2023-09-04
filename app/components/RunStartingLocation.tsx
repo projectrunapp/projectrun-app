@@ -24,8 +24,8 @@ export default function RunStartingLocation({showPopup, permissionAllowed, setPe
                 lng: location.coords.longitude,
             });
 
-            // const currentTime = new Date().toLocaleTimeString("en-US", {hour12: false});
-            // console.log(`${currentTime} >>> ${location.coords.latitude}, ${location.coords.longitude}`);
+            const currentTime = new Date().toLocaleTimeString("en-US", {hour12: false});
+            console.log(`${currentTime} >>> ${location.coords.latitude}, ${location.coords.longitude}`);
         } else {
             setRetrievingLocation(false);
             setPermissionAllowed(false);

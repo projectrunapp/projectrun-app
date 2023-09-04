@@ -40,15 +40,23 @@ export default function RunScreen() {
     //     setRunProcessingPopupVisible(false);
     // }
     const stopRunProcessing = () => {
-        setRunProcessingPopupVisible(false);
         setRunState(runStates.NOT_STARTED);
         setRunStartedAt(0);
         setStartCountdownSeconds(startRunBtnPressSeconds);
         setIsStartBtnPressed(false);
 
-        // TODO: send the message ("Run stopped successfully.") details to the next screen
-        //  and open popup modal (run "showPopup") there
-        navigation.navigate("Run", { screen: "SingleRunScreen", params: {runId: 1, title: "Morning Run!"}});
+        // TODO: await processing to stop
+
+        setRunProcessingPopupVisible(false);
+
+        navigation.navigate("Run", { screen: "SingleRunScreen", params: {
+            runId: 1,
+            title: "Morning Run!",
+            popup: {
+                success: true,
+                message: "Run stopped successfully.",
+            },
+        }});
     }
 
     return (

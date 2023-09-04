@@ -5,12 +5,25 @@ import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext";
 import RunDetails from "../components/RunDetails";
 import RunMap from "../components/RunMap";
+import PopupMessage from "../components/PopupMessage";
 
 const SingleRunScreen = ({ route }: any) => {
-    const { runId } = route.params;
+    const { runId, title, popup } = route.params;
     const { authState } = useAuth();
     const [loading, setLoading] = useState(true);
     const [run, setRun] = useState<any>({});
+
+    const [isPopupVisible, setPopupVisible] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const [popupSuccess, setPopupSuccess] = useState<boolean>(true);
+    const showPopup = (success: boolean, message: string) => {
+        setPopupMessage(message);
+        setPopupSuccess(success);
+        setPopupVisible(true);
+    }
+    const closePopup = () => {
+        setPopupVisible(false); // setPopupMessage(""); setPopupSuccess(true);
+    }
 
     const loadRun = async (id: number) => {
         setLoading(true);
@@ -34,6 +47,9 @@ const SingleRunScreen = ({ route }: any) => {
 
     useEffect(() => {
         loadRun(runId);
+        if (popup && popup.message) {
+            showPopup(popup.success, popup.message);
+        }
     }, []);
 
     if (loading) {
@@ -53,6 +69,11 @@ const SingleRunScreen = ({ route }: any) => {
 
     return (
         <ScrollView>
+            <PopupMessage isVisible={isPopupVisible}
+                          message={popupMessage}
+                          success={popupSuccess}
+                          onClose={closePopup}
+            />
             <RunMap style={styles.map_container} runId={runId} />
             <RunDetails run={run} />
         </ScrollView>

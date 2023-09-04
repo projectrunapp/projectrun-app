@@ -64,7 +64,9 @@ export default function RunControls({
 
                 <Text style={{fontSize: 18, marginBottom: 16}}>
                     {isStartBtnPressed ? (
-                        <>Run will be started in <Text style={{fontWeight: 'bold'}}>{startCountdownSeconds}</Text> seconds...</>
+                        (startCountdownSeconds === 0) ?
+                            <>Preparing to start...</> :
+                            <>Run will start in <Text style={{fontWeight: 'bold'}}>{startCountdownSeconds}</Text> seconds...</>
                     ) : (
                         <>State: <Text style={{fontWeight: 'bold'}}>{runStateTitles[runState]}</Text></>
                     )}

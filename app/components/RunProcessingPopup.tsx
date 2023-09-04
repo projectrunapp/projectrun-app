@@ -76,7 +76,9 @@ export default function RunProcessingPopup({
                     </Text>
                     <Text style={{fontSize: 18, marginBottom: 16}}>
                         {isStopBtnPressed ? (
-                            <Text>Run will be stopped in <Text style={{fontWeight: 'bold'}}>{stopCountdownSeconds}</Text> seconds...</Text>
+                            (stopCountdownSeconds === 0) ?
+                                <>Preparing to stop...</> :
+                                <>Run will stop after <Text style={{fontWeight: 'bold'}}>{stopCountdownSeconds}</Text> seconds...</>
                         ) : (
                             <Text>Run Processing...</Text>
                         )}
