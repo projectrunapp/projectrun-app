@@ -1,15 +1,15 @@
 
 import * as Location from "expo-location";
 import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
-import {useEffect, useState} from "react";
-import {Button, StyleSheet, Text, View} from "react-native";
-import {appPrimaryColor, updateStartingLocationTimeoutSeconds} from "../utils/app-constants";
+import React, {useEffect, useState} from "react";
+import {ActivityIndicator, Button, StyleSheet, Text, View} from "react-native";
+import {appPrimaryColor, updateLocationTimeoutSeconds} from "../utils/app-constants";
 import {useIsFocused} from "@react-navigation/native";
 
 export default function RunStartingLocation({showPopup, permissionAllowed, setPermissionAllowed}) {
+    const isFocused = useIsFocused();
     const [retrievingLocation, setRetrievingLocation] = useState<boolean>(true);
     const [currentLocation, setCurrentLocation] = useState<any>(null);
-    const isFocused = useIsFocused();
 
     const updateLocation = async () => {
         const permissionRequest = await Location.requestForegroundPermissionsAsync();
@@ -23,7 +23,9 @@ export default function RunStartingLocation({showPopup, permissionAllowed, setPe
                 lat: location.coords.latitude,
                 lng: location.coords.longitude,
             });
-            // console.log(`Current location: ${location.coords.latitude}, ${location.coords.longitude}`);
+
+            // const currentTime = new Date().toLocaleTimeString("en-US", {hour12: false});
+            // console.log(`${currentTime} >>> ${location.coords.latitude}, ${location.coords.longitude}`);
         } else {
             setRetrievingLocation(false);
             setPermissionAllowed(false);
@@ -37,7 +39,7 @@ export default function RunStartingLocation({showPopup, permissionAllowed, setPe
         if (isFocused && permissionAllowed) { // the component mounts or the screen gains focus
             intervalId = setInterval(() => {
                 updateLocation();
-            }, updateStartingLocationTimeoutSeconds * 1000);
+            }, updateLocationTimeoutSeconds * 1000);
         } else { // the screen loses focus
             clearInterval(intervalId);
         }
@@ -53,9 +55,7 @@ export default function RunStartingLocation({showPopup, permissionAllowed, setPe
 
     return retrievingLocation ? (
         <View style={styles.loading_container}>
-            <Text style={styles.loading_text}>
-                Retrieving location...
-            </Text>
+            <ActivityIndicator size="large" />
         </View>
     ) : (permissionAllowed ? (
         currentLocation ? (
