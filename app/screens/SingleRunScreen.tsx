@@ -94,8 +94,8 @@ const SingleRunScreen = ({ route }: any) => {
                         return {
                             latitude: c.lat,
                             longitude: c.lng,
-                            latitudeDelta: 0.05,
-                            longitudeDelta: 0.05,
+                            latitudeDelta: 0.01,
+                            longitudeDelta: 0.01,
                         };
                     });
                     setCoordinates(runCoordinates);
