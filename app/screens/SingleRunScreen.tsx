@@ -6,12 +6,23 @@ import {useAuth} from "../context/AuthContext";
 import RunDetails from "../components/RunDetails";
 import RunMap from "../components/RunMap";
 import PopupMessage from "../components/PopupMessage";
+import {useRunData} from "../context/RunDataContext";
 
 const SingleRunScreen = ({ route }: any) => {
+    const {storageGetRun, storageGetRunCoordinates} = useRunData();
+
     const { runId, title, popup } = route.params;
     const { authState } = useAuth();
     const [loading, setLoading] = useState(true);
-    const [run, setRun] = useState<any>({});
+    const [run, setRun] = useState<{
+        title: string,
+        started: number,
+        completed: number,
+        distance: number,
+        duration: number,
+        avg_speed: number,
+    }>(null);
+    const [coordinates, setCoordinates] = useState([]);
 
     const [isPopupVisible, setPopupVisible] = useState<boolean>(false);
     const [popupMessage, setPopupMessage] = useState<string>("");
@@ -25,7 +36,7 @@ const SingleRunScreen = ({ route }: any) => {
         setPopupVisible(false); // setPopupMessage(""); setPopupSuccess(true);
     }
 
-    const loadRun = async (id: number) => {
+    const loadRunFromServer = async (id: number) => {
         setLoading(true);
         try {
             const response = await axios.get(`${process.env.API_URL}/run/my-runs/${id}`, {
@@ -35,7 +46,57 @@ const SingleRunScreen = ({ route }: any) => {
                 }
             });
             if (response.data.success && response.data.data) {
-                setRun(response.data.data);
+                setRun({
+                    title: response.data.data.title,
+                    started: new Date(response.data.data.started_at).getTime(),
+                    completed: new Date(response.data.data.completed_at).getTime(),
+                    distance: response.data.data.distance,
+                    duration: response.data.data.duration,
+                    avg_speed: response.data.data.avg_speed,
+                });
+                const coordinatesParsed = JSON.parse(response.data.data.coordinates);
+                const runCoordinates = coordinatesParsed.map((c: any) => {
+                    return {
+                        latitude: parseFloat(c.lat),
+                        longitude: parseFloat(c.lng),
+                        latitudeDelta: 0.1,
+                        longitudeDelta: 0.1,
+                    };
+                });
+                setCoordinates(runCoordinates);
+            }
+            setLoading(false);
+        } catch (err) {
+            console.error(err.message);
+            setLoading(false);
+            // Alert.alert('Error', 'Something went wrong!');
+        }
+    };
+    const loadRunFromStorage = async () => {
+        setLoading(true);
+        try {
+            const storageRun = await storageGetRun();
+            if (storageRun) {
+                setRun({
+                    title: storageRun.title,
+                    started: storageRun.timestamp_started * 1000,
+                    completed: storageRun.timestamp_last_updated * 1000,
+                    distance: storageRun.distance,
+                    duration: storageRun.duration,
+                    avg_speed: storageRun.avg_speed,
+                });
+                const storageRunCoordinates = await storageGetRunCoordinates();
+                if (storageRunCoordinates) {
+                    const runCoordinates = storageRunCoordinates.map((c: any) => {
+                        return {
+                            latitude: c.lat,
+                            longitude: c.lng,
+                            latitudeDelta: 0.05,
+                            longitudeDelta: 0.05,
+                        };
+                    });
+                    setCoordinates(runCoordinates);
+                }
             }
             setLoading(false);
         } catch (err) {
@@ -46,7 +107,12 @@ const SingleRunScreen = ({ route }: any) => {
     };
 
     useEffect(() => {
-        loadRun(runId);
+        if (runId) {
+            loadRunFromServer(runId);
+        } else {
+            loadRunFromStorage();
+        }
+
         if (popup && popup.message) {
             showPopup(popup.success, popup.message);
         }
@@ -59,13 +125,6 @@ const SingleRunScreen = ({ route }: any) => {
             </View>
         );
     }
-    if (Object.keys(run).length === 0) {
-        return (
-            <View style={styles.loading_container}>
-                <Text>Run not found!</Text>
-            </View>
-        );
-    }
 
     return (
         <ScrollView>
@@ -74,7 +133,14 @@ const SingleRunScreen = ({ route }: any) => {
                           success={popupSuccess}
                           onClose={closePopup}
             />
-            <RunMap style={styles.map_container} runId={runId} />
+            {coordinates.length > 0 && (
+                <RunMap style={styles.map_container}
+                    // firstCoordinate={coordinates[0]}
+                    // lastCoordinate={coordinates[coordinates.length - 1]}
+                    // firstCoordinate={run.first_coordinate}
+                    // lastCoordinate={run.last_coordinate}
+                        coordinates={coordinates} />
+            )}
             <RunDetails run={run} />
         </ScrollView>
     );

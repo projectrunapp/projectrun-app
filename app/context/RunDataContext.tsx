@@ -205,12 +205,13 @@ export const RunDataProvider = ({ children }: any) => {
 
         if (coordinatesCount > 0) {
             // distance_piece & distance & distance_pauses_included
-            distancePiece = calculateDistanceInMeters(
+            const distancePieceWithDecimals = calculateDistanceInMeters(
                 parseFloat(lastCoordinate.lat),
                 parseFloat(lastCoordinate.lng),
                 lat,
                 lng,
             );
+            distancePiece = Math.round(distancePieceWithDecimals);
             if (isActive) {
                 distance = parseInt(runs[runIndex].distance) + distancePiece;
                 runs[runIndex].distance = distance;
@@ -228,12 +229,12 @@ export const RunDataProvider = ({ children }: any) => {
             runs[runIndex].duration_pauses_included = durationPausesIncluded;
 
             // avg_speed_piece & avg_speed & avg_speed_pauses_included
-            avgSpeedPiece = Math.round((distancePiece / durationPiece) * 1000) / 1000;
+            avgSpeedPiece = Math.round((distancePiece / durationPiece) * 100) / 100;
             if (isActive) {
-                avgSpeed = Math.round((runs[runIndex].duration / runs[runIndex].distance) * 1000) / 1000;
+                avgSpeed = Math.round((runs[runIndex].duration / runs[runIndex].distance) * 100) / 100;
                 runs[runIndex].avg_speed = avgSpeed;
             }
-            avgSpeedPausesIncluded = Math.round((runs[runIndex].duration_pauses_included / runs[runIndex].distance_pauses_included) * 1000) / 1000;
+            avgSpeedPausesIncluded = Math.round((runs[runIndex].duration_pauses_included / runs[runIndex].distance_pauses_included) * 100) / 100;
             runs[runIndex].avg_speed_pauses_included = avgSpeedPausesIncluded;
         }
 
@@ -283,23 +284,36 @@ export const RunDataProvider = ({ children }: any) => {
         return [];
     }
 
-    // get run from "runs"
-    const storageGetRun = async (runNumber: number) => {
+    // get run from "runs" (get last run if runNumber is not provided)
+    const storageGetRun = async (runNumber?: number) => {
         const runsJson = await AsyncStorage.getItem('runs');
         if (runsJson) {
             const runs = JSON.parse(runsJson);
-            return runs.find((run) => parseInt(run.run_number) === runNumber);
+            if (runNumber) {
+                return runs.find((run) => parseInt(run.run_number) === runNumber);
+            } else {
+                return runs[runs.length - 1];
+            }
         }
+
         return null;
     }
 
-    // get run coordinates from "run_coordinates_{runNumber}"
-    const storageGetRunCoordinates = async (runNumber: number) => {
-        const runCoordinatesJson = await AsyncStorage.getItem(`run_coordinates_${runNumber}`);
-        if (runCoordinatesJson) {
-            return JSON.parse(runCoordinatesJson);
+    // get run coordinates from "run_coordinates_{runNumber}" (get last run coordinates if runNumber is not provided)
+    const storageGetRunCoordinates = async (runNumber?: number) => {
+        let runCoordinates = [], runCoordinatesJson = null, coordinates = [];
+        if (runNumber) {
+            runCoordinatesJson = await AsyncStorage.getItem(`run_coordinates_${runNumber}`);
+        } else {
+            const runsCount = await storageGetRunsCount();
+            runCoordinatesJson = await AsyncStorage.getItem(`run_coordinates_${runsCount}`);
         }
-        return [];
+
+        if (runCoordinatesJson) {
+            runCoordinates = JSON.parse(runCoordinatesJson);
+        }
+
+        return runCoordinates;
     };
 
     // update run title in "runs"
@@ -391,17 +405,19 @@ export const RunDataProvider = ({ children }: any) => {
 
             // sync storage runs and its coordinates with server
             const isSynced = await syncWithServer(token, allRunsData);
-
-            // if synced, clear all runs and its coordinates
-            if (isSynced) {
-                await storageFlushAllRunsData();
+            if (!isSynced) {
+                // console.error("Runs data wasn't synced!");
+                return;
             }
+
+            await storageFlushAllRunsData();
         });
     }
 
 
 
     // INTERNAL METHODS
+    // get runs_count from "runs_count"
     const storageGetRunsCount = async (): Promise<number> => {
         const runsCountString = await AsyncStorage.getItem('runs_count');
         if (runsCountString) {
@@ -411,6 +427,7 @@ export const RunDataProvider = ({ children }: any) => {
             return 0;
         }
     }
+    // sync storage runs and its coordinates with server
     const syncWithServer = async (token: string, data: any): Promise<boolean> => {
         try {
             const response = await axios.put(`${process.env.API_URL}/run/sync`, {

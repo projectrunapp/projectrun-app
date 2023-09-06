@@ -13,6 +13,7 @@ export function calculateDistanceInMeters(lat1, lng1, lat2, lon2) {
     return distance;
 }
 
+// generate run title based on current time of day
 export function generateRunTitle(hour?: number): string {
     // check if "hour" is provided
     if (!hour) {
@@ -31,4 +32,20 @@ export function generateRunTitle(hour?: number): string {
     }
 
     return title;
+}
+
+// example: convert "2023-08-25T07:07:26.240Z" to "Aug 25, 2023; 7:07 AM"
+export function dateStringFormat(dateString: number): string {
+    const date = new Date(dateString);
+
+    const month = date.toLocaleString('default', { month: 'short' });
+    const day = date.getDate();
+    const year = date.getFullYear();
+    const time = date.toLocaleString('default', {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true
+    })
+
+    return `${month} ${day}, ${year}; ${time}`;
 }
