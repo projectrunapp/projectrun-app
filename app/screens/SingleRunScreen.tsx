@@ -64,12 +64,15 @@ const SingleRunScreen = ({ route }: any) => {
                     };
                 });
                 setCoordinates(runCoordinates);
+            } else {
+                // console.error(response.data.message);
+                Alert.alert('Error', "Something went wrong. Please try again later!");
             }
             setLoading(false);
         } catch (err) {
-            console.error(err.message);
+            // console.error(err.message);
             setLoading(false);
-            // Alert.alert('Error', 'Something went wrong!');
+            Alert.alert('Error', "Something went wrong!");
         }
     };
     const loadRunFromStorage = async () => {
@@ -97,12 +100,14 @@ const SingleRunScreen = ({ route }: any) => {
                     });
                     setCoordinates(runCoordinates);
                 }
+            } else {
+                Alert.alert('Error', "There is no local run data!");
             }
             setLoading(false);
         } catch (err) {
             // console.error(err.message);
             setLoading(false);
-            Alert.alert('Error', 'Something went wrong!');
+            Alert.alert('Error', "Something went wrong!");
         }
     };
 

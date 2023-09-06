@@ -42,7 +42,7 @@ const ReceivedFriendRequestsScreen = () => {
         } catch (err) {
             // console.error(err.message);
             setLoading(false);
-            Alert.alert('Error', 'Something went wrong!');
+            Alert.alert('Error', "Something went wrong!");
         }
     };
 
