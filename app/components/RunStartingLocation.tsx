@@ -6,7 +6,12 @@ import {ActivityIndicator, Button, StyleSheet, Text, View} from "react-native";
 import {appPrimaryColor, updateLocationTimeoutSeconds} from "../utils/app-constants";
 import {useIsFocused} from "@react-navigation/native";
 
-export default function RunStartingLocation({showPopup, permissionAllowed, setPermissionAllowed}) {
+export default function RunStartingLocation({
+                                                showPopup,
+                                                permissionAllowed,
+                                                setPermissionAllowed,
+                                                addRunCoordinate,
+}) {
     const isFocused = useIsFocused();
     const [retrievingLocation, setRetrievingLocation] = useState<boolean>(true);
     const [currentLocation, setCurrentLocation] = useState<any>(null);
@@ -24,8 +29,11 @@ export default function RunStartingLocation({showPopup, permissionAllowed, setPe
                 lng: location.coords.longitude,
             });
 
+            // calling the async method without await
+            addRunCoordinate(location.coords.latitude, location.coords.longitude);
+
             const currentTime = new Date().toLocaleTimeString("en-US", {hour12: false});
-            console.log(`${currentTime} >>> ${location.coords.latitude}, ${location.coords.longitude}`);
+            console.log(`LOCATION: ${currentTime} >>> ${location.coords.latitude}, ${location.coords.longitude}`);
         } else {
             setRetrievingLocation(false);
             setPermissionAllowed(false);

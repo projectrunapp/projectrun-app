@@ -1,7 +1,6 @@
 
 import {TouchableOpacity, StyleSheet, View, Text} from 'react-native';
 import {runStateTitles, runStates, startRunBtnPressSeconds} from "../utils/app-constants";
-import React, {useState} from "react";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 export default function RunControls({
@@ -9,7 +8,6 @@ export default function RunControls({
                                         permissionAllowed,
                                         startRunProcessing,
                                         runState,
-                                        setRunState,
                                         setRunStartedAt,
                                         startCountdownSeconds,
                                         setStartCountdownSeconds,
@@ -21,6 +19,7 @@ export default function RunControls({
         this.startBtnPressedInTime = Date.now();
 
         this.intervalForStart = setInterval(() => {
+            // TODO: don't divide by 1000
             if (Math.floor((Date.now() - this.startBtnPressedInTime) / 1000) >= startRunBtnPressSeconds) {
                 // showPopup(true, "Run started.");
                 setStartCountdownSeconds(startRunBtnPressSeconds);
@@ -29,7 +28,6 @@ export default function RunControls({
                 this.startBtnPressedInTime = 0;
                 setIsStartBtnPressed(false);
 
-                setRunState(runStates.RUNNING);
                 setRunStartedAt(Date.now());
 
                 startRunProcessing();

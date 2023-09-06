@@ -1,5 +1,5 @@
 
-import {View, Text, Modal, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator} from 'react-native';
 import {
     appPrimaryColor,
     guaranteeSecondsAfterStartBtnPress,
@@ -8,6 +8,7 @@ import {
 } from "../utils/app-constants";
 import {useState} from "react";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
+import {useRunData} from "../context/RunDataContext";
 
 export default function RunProcessingPopup({
                                                isVisible,
@@ -16,17 +17,27 @@ export default function RunProcessingPopup({
                                                runState,
                                                setRunState,
                                                runStartedAt,
-                                               stopRunProcessing
+                                               stopRunProcessing,
+                                               stopRunLoading
                                            }) {
+    const { storageSetRunState } = useRunData();
+
     const pauseOrResume = () => {
         // check that the "Pause" ("Resume") button hasn't pressed automatically after holding the "Start" button
         if (runStartedAt !== 0 && Date.now() - runStartedAt >= guaranteeSecondsAfterStartBtnPress * 1000) {
             if (runState === runStates.RUNNING) {
                 showPopup(true, "Run paused.");
                 setRunState(runStates.PAUSED);
-            } else { // runState === runStates.PAUSED
+
+                // call the async method without await
+                storageSetRunState(runStates.PAUSED);
+            }
+            if (runState === runStates.PAUSED) {
                 showPopup(true, "Run resumed.");
                 setRunState(runStates.RUNNING);
+
+                // call the async method without await
+                storageSetRunState(runStates.RUNNING);
             }
         }
     };
@@ -107,6 +118,16 @@ export default function RunProcessingPopup({
                             </TouchableOpacity>
                         </View>
                     )}
+                    {stopRunLoading && (
+                        <View style={styles.loading_container}>
+                            <Text style={styles.loading_text}>
+                                Preparing to stop...
+                            </Text>
+                            <View style={styles.loading_spinner}>
+                                <ActivityIndicator size="large" />
+                            </View>
+                        </View>
+                    )}
                 </View>
             </View>
         </Modal>
@@ -142,6 +163,18 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         width: 100,
         height: 100,
+    },
+    loading_container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    loading_text: {
+        fontSize: 18,
+        marginBottom: 16,
+    },
+    loading_spinner: {
+        marginTop: 16,
     },
     close_btn: {
         position: 'absolute',
