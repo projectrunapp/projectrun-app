@@ -105,7 +105,7 @@ export const RunDataProvider = ({ children }: any) => {
     const storageCreateRun = async () => {
         const storageRunState = await storageGetRunState();
         if (storageRunState === runStates.RUNNING || storageRunState === runStates.PAUSED) {
-            // console.log('Storage run state is already running or paused!');
+            // console.info("Storage run state is already running or paused!");
             return;
         } else {
             await storageSetRunState(runStates.RUNNING);
@@ -149,7 +149,7 @@ export const RunDataProvider = ({ children }: any) => {
     const storageAddRunCoordinate = async (lat: number, lng: number, isActive: boolean) => {
         const storageRunState = await storageGetRunState();
         if (storageRunState !== runStates.RUNNING && storageRunState !== runStates.PAUSED) {
-            // console.log('Storage run state is not running or paused!');
+            // console.info("Storage run state is not running or paused!");
             return;
         }
 
@@ -371,21 +371,21 @@ export const RunDataProvider = ({ children }: any) => {
     const sendAllRunsDataToServer = async () => {
         NetInfo.fetch().then(async (state) => {
             if (!state.isConnected) {
-                // console.log("No internet connection!");
+                // console.info("No internet connection!");
                 return;
             }
 
             // get all the storage runs and its coordinates
             const allRunsData = await storageGetAllRunsData();
             if (allRunsData.length === 0) {
-                // console.log("No runs data in storage!");
+                // console.error("No runs data in storage!");
                 return;
             }
 
             // get auth token
             const token = await SecureStore.getItemAsync(process.env.JWT_KEY);
             if (!token) {
-                // console.log("No auth token!");
+                // console.error("No auth token!");
                 return;
             }
 
@@ -424,7 +424,7 @@ export const RunDataProvider = ({ children }: any) => {
 
             return response.data.success;
         } catch (err) {
-            // console.log(err.message);
+            // console.error(err.message);
             return false;
         }
     }

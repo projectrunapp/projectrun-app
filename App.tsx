@@ -9,10 +9,10 @@ export default function App() {
     // TODO: remove this block
     // try {
     //     AsyncStorage.clear()
-    //     console.log("AsyncStorage cleared");
+    //     console.info("AsyncStorage cleared.");
     // } catch(err) {
     //     // clear error
-    //     console.log("AsyncStorage clear error: ", err.message);
+    //     console.error("AsyncStorage clear error: ", err.message);
     // }
 
     return (

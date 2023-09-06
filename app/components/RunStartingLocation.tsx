@@ -33,7 +33,7 @@ export default function RunStartingLocation({
             addRunCoordinate(location.coords.latitude, location.coords.longitude);
 
             const currentTime = new Date().toLocaleTimeString("en-US", {hour12: false});
-            console.log(`LOCATION: ${currentTime} >>> ${location.coords.latitude}, ${location.coords.longitude}`);
+            console.info(`LOCATION: ${currentTime} >>> ${location.coords.latitude}, ${location.coords.longitude}`);
         } else {
             setRetrievingLocation(false);
             setPermissionAllowed(false);

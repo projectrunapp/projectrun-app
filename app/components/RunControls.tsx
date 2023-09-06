@@ -32,7 +32,7 @@ export default function RunControls({
 
                 startRunProcessing();
             } else {
-                // console.log("Start button pressed time: ", Math.floor((Date.now() - this.startBtnPressedInTime) / 1000));
+                // console.info("Start button pressed time: ", Math.floor((Date.now() - this.startBtnPressedInTime) / 1000));
                 setStartCountdownSeconds(prevState => prevState - 1);
             }
         }, 1000);

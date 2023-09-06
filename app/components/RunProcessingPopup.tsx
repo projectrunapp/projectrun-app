@@ -61,7 +61,7 @@ export default function RunProcessingPopup({
 
                 stopRunProcessing();
             } else {
-                // console.log("Stop button pressed time: ", Math.floor((Date.now() - this.stopBtnPressedInTime) / 1000));
+                // console.info("Stop button pressed time: ", Math.floor((Date.now() - this.stopBtnPressedInTime) / 1000));
                 setStopCountdownSeconds(prevState => prevState - 1);
             }
         }, 1000);

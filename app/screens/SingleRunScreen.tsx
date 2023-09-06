@@ -39,7 +39,7 @@ const SingleRunScreen = ({ route }: any) => {
             }
             setLoading(false);
         } catch (err) {
-            // console.log(err.message);
+            // console.error(err.message);
             setLoading(false);
             Alert.alert('Error', 'Something went wrong!');
         }

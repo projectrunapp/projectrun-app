@@ -72,6 +72,7 @@ export default function RunScreen() {
 
         setRunProcessingPopupVisible(false);
 
+        // @ts-ignore
         navigation.navigate("Run", { screen: "SingleRunScreen", params: {
             runId: 1,
             title: "Morning Run!",

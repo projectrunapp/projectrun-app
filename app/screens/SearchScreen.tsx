@@ -48,7 +48,7 @@ const SearchScreen = () => {
                 Alert.alert('Error', 'Something went wrong. Please try again!');
             }
         } catch (err) {
-            // console.log(err.message);
+            // console.error(err.message);
             Alert.alert('Error', 'Something went wrong!');
         } finally {
             setLoading(false);

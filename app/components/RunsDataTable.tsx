@@ -18,6 +18,7 @@ const RunsDataTable = () => {
     const [perPage, setPerPage] = useState(paginationPerPages[0]); // 10
 
     const navigateToSingleRun = (runId: number, title: string) => {
+        // @ts-ignore
         navigation.navigate("Run", { screen: "SingleRunScreen", params: { runId, title } });
     };
 
@@ -36,7 +37,7 @@ const RunsDataTable = () => {
             }
             setLoading(false);
         } catch (err) {
-            // console.log(err.message);
+            // console.error(err.message);
             setLoading(false);
             Alert.alert('Error', 'Something went wrong!');
         }
