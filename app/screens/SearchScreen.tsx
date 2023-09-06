@@ -45,11 +45,11 @@ const SearchScreen = () => {
             if (response.data.success && response.data.data) {
                 setUsers(response.data.data);
             } else {
-                Alert.alert('Error', 'Something went wrong. Please try again!');
+                Alert.alert('Error', "Something went wrong. Please try again!");
             }
         } catch (err) {
-            // console.log(err.message);
-            Alert.alert('Error', 'Something went wrong!');
+            // console.error(err.message);
+            Alert.alert('Error', "Something went wrong!");
         } finally {
             setLoading(false);
         }

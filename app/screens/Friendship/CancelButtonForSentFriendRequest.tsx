@@ -22,7 +22,7 @@ const CancelButtonForSentFriendRequest = ({ item, showPopup, removeFriendRequest
                 showPopup(false, "Something went wrong. Please try again!");
             }
         } catch (err) {
-            // console.log(err.message);
+            // console.error(err.message);
             showPopup(false, "Something went wrong!");
         }
     };

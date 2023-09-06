@@ -3,11 +3,11 @@ import { ExpoConfig, ConfigContext } from '@expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
     ...config,
+    name: "ProjectRun",
     slug: "ProjectRunApp",
-    name: "ProjectRunApp",
     android: {
         adaptiveIcon: {
-            foregroundImage: "./assets/adaptive-icon.png",
+            foregroundImage: "./assets/app-adaptive-icon.png",
             backgroundColor: "#ffffff"
         },
         package: "com.boolfalse.ProjectRunApp",

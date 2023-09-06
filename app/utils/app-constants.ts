@@ -15,6 +15,7 @@ export const popupOptions = {
     error_color: '#E25E3E',
 };
 
+export const updateLocationTimeoutSeconds = 10; // 10-30
 export const startRunBtnPressSeconds = 3;
 export const stopRunBtnPressSeconds = 3;
 export const guaranteeSecondsAfterStartBtnPress = 3;

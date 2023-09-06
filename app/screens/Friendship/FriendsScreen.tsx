@@ -50,9 +50,9 @@ const FriendsScreen = () => {
             }
             setLoading(false);
         } catch (err) {
-            // console.log(err.message);
+            // console.error(err.message);
             setLoading(false);
-            Alert.alert('Error', 'Something went wrong!');
+            Alert.alert('Error', "Something went wrong!");
         }
     };
 
