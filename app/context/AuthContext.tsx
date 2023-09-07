@@ -11,11 +11,13 @@ interface AuthProps {
         id: number | null,
         name: string | null,
         email: string | null,
+        username: string | null,
     },
     getStorageUser?: () => Promise<{
         storageUserId: number | null,
         storageUserName: string | null,
         storageUserEmail: string | null,
+        storageUserUsername: string | null,
     }>,
     onRegister?: (email: string,
                   password: string,
@@ -40,34 +42,40 @@ export const AuthProvider = ({children}: any) => {
         id: number | null,
         name: string | null,
         email: string | null,
+        username: string | null,
     }>({
         authenticated: false,
         token: null,
         id: null,
         name: null,
         email: null,
+        username: null,
     });
 
     const getStorageUser = async () => {
         const id = await AsyncStorage.getItem('user_id');
         const name = await AsyncStorage.getItem('user_name');
         const email = await AsyncStorage.getItem('user_email');
+        const username = await AsyncStorage.getItem('user_username');
 
         return {
             storageUserId: id ? parseInt(id) : null,
             storageUserName: name,
             storageUserEmail: email,
+            storageUserUsername: username,
         }
     }
     const setStorageUser = async (userData) => {
         await AsyncStorage.setItem('user_id', userData.id.toString());
         await AsyncStorage.setItem('user_name', userData.name);
         await AsyncStorage.setItem('user_email', userData.email);
+        await AsyncStorage.setItem('user_username', userData.username);
     };
     const clearStorageUser = async () => {
         await AsyncStorage.setItem('user_id', '');
         await AsyncStorage.setItem('user_name', '');
         await AsyncStorage.setItem('user_email', '');
+        await AsyncStorage.setItem('user_username', '');
     };
 
     const login = async (email: string, password: string) => {
@@ -83,6 +91,7 @@ export const AuthProvider = ({children}: any) => {
                 id: userData.id,
                 name: userData.name,
                 email: userData.email,
+                username: userData.username,
             });
 
             setAuthState({
@@ -91,6 +100,7 @@ export const AuthProvider = ({children}: any) => {
                 id: userData.id,
                 name: userData.name,
                 email: userData.email,
+                username: userData.username,
             });
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
@@ -142,6 +152,7 @@ export const AuthProvider = ({children}: any) => {
             id: null,
             name: null,
             email: null,
+            username: null,
         });
     }
 
@@ -153,6 +164,7 @@ export const AuthProvider = ({children}: any) => {
                 storageUserId,
                 storageUserName,
                 storageUserEmail,
+                storageUserUsername,
             } = await getStorageUser();
 
             setAuthState({
@@ -161,6 +173,7 @@ export const AuthProvider = ({children}: any) => {
                 id: storageUserId,
                 name: storageUserName,
                 email: storageUserEmail,
+                username: storageUserUsername,
             });
         }
     };

@@ -10,6 +10,7 @@ export default function ProfileScreen() {
     const [storageUserId, setStorageUserId] = useState<number | null>(null);
     const [name, setName] = useState<string | null>(null);
     const [email, setEmail] = useState<string | null>(null);
+    const [username, setUsername] = useState<string | null>(null);
 
     const getUserData = async () => {
         if (getStorageUser) {
@@ -17,6 +18,7 @@ export default function ProfileScreen() {
             setStorageUserId(storageUser.storageUserId);
             setName(storageUser.storageUserName);
             setEmail(storageUser.storageUserEmail);
+            setUsername(storageUser.storageUserUsername);
         }
     };
 
@@ -55,10 +57,12 @@ export default function ProfileScreen() {
                     <View style={styles.info_keys}>
                         <Text>Name:</Text>
                         <Text>Email:</Text>
+                        <Text>Username:</Text>
                     </View>
                     <View style={styles.info_values}>
                         <Text>{name}</Text>
                         <Text>{email}</Text>
+                        <Text>{username}</Text>
                     </View>
                 </View>
 
