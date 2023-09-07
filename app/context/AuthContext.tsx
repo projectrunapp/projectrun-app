@@ -74,10 +74,7 @@ export const AuthProvider = ({children}: any) => {
         try {
             const response = await axios.post(`${process.env.API_URL}/auth/login`, {email, password});
             if (!response.data.success) {
-                return {
-                    error: true,
-                    message: response.data.message,
-                }
+                return response.data;
             }
 
             const userData = response.data.data;
@@ -102,11 +99,9 @@ export const AuthProvider = ({children}: any) => {
             await SecureStore.setItemAsync(process.env.JWT_KEY, userData.access_token);
 
             return response.data;
-        } catch (e) {
-            return {
-                error: true,
-                message: (e as any).response.data.message,
-            }
+        } catch (err) {
+            // console.error(err.message);
+            return {success: false, message: "Something went wrong!"};
         }
     }
 
@@ -125,20 +120,11 @@ export const AuthProvider = ({children}: any) => {
                 birth_date,
                 gender
             });
-            
-            if (!response.data.success) {
-                return {
-                    error: true,
-                    message: response.data.message,
-                }
-            }
 
             return response.data;
-        } catch (e) {
-            return {
-                error: true,
-                message: (e as any).response.data.message,
-            }
+        } catch (err) {
+            // console.error(err.message);
+            return {success: false, message: "Something went wrong!"};
         }
     }
 

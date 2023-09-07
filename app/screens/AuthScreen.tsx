@@ -23,11 +23,24 @@ import {
 } from "../utils/app-constants";
 import Constants from 'expo-constants';
 import RNDateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker
+import PopupMessage from "../components/PopupMessage";
 
 const AuthScreen = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [isLoginBtnActive, setIsLoginBtnActive] = useState<boolean>(false);
     const [isRegisterBtnActive, setIsRegisterBtnActive] = useState<boolean>(false);
+
+    const [isPopupVisible, setPopupVisible] = useState<boolean>(false);
+    const [popupMessage, setPopupMessage] = useState<string>("");
+    const [popupSuccess, setPopupSuccess] = useState<boolean>(true);
+    const showPopup = (success: boolean, message: string) => {
+        setPopupMessage(message);
+        setPopupSuccess(success);
+        setPopupVisible(true);
+    }
+    const closePopup = () => {
+        setPopupVisible(false); // setPopupMessage(""); setPopupSuccess(true);
+    }
 
     const [loginEmail, setLoginEmail] = useState<string>(process.env.DEV_USER_EMAIL || '');
     const [loginPassword, setLoginPassword] = useState<string>(process.env.DEV_USER_PASSWORD || '');
@@ -61,7 +74,7 @@ const AuthScreen = () => {
         setLoading(true);
         const result = await onLogin!(loginEmail, loginPassword);
         setLoading(false);
-        if (result && result.error) {
+        if (!result.success) {
             alert(result.message);
         }
     }
@@ -73,9 +86,16 @@ const AuthScreen = () => {
         setLoading(true);
         const result = await onRegister!(registerEmail, registerPassword , username, name, birthDate, selectedGender);
         setLoading(false);
-        if (result && result.error) {
-            alert(result.message);
+        if (result.success) {
+            setShowLogin(true);
+            setRegisterEmail('');
+            setRegisterPassword('');
+            setUsername('');
+            setName('');
+            setBirthDate('');
+            setSelectedGender(genders[0].value);
         }
+        showPopup(result.success, result.message);
     }
 
     useEffect(() => {
@@ -96,6 +116,11 @@ const AuthScreen = () => {
 
     return (
         <View style={styles.container}>
+            <PopupMessage isVisible={isPopupVisible}
+                          message={popupMessage}
+                          success={popupSuccess}
+                          onClose={closePopup}
+            />
             <Image source={{uri: splashLogoUrl}} style={styles.image} alt="Logo"/>
             {showLogin ? (
                 <View style={styles.form}>
@@ -115,7 +140,7 @@ const AuthScreen = () => {
                     </Pressable>
 
                     <Text style={styles.navigate_text}>
-                        Don't have an account? <Text style={styles.navigate_link} onPress={(e) => setShowLogin(false)}>Register</Text>
+                        Don't have an account? <Text style={styles.navigate_link} onPress={() => setShowLogin(false)}>Register</Text>
                     </Text>
                 </View>
             ) : (
@@ -159,7 +184,7 @@ const AuthScreen = () => {
                     </Pressable>
 
                     <Text style={styles.navigate_text}>
-                        Already have an account? <Text style={styles.navigate_link} onPress={(e) => setShowLogin(true)}>Login</Text>
+                        Already have an account? <Text style={styles.navigate_link} onPress={() => setShowLogin(true)}>Login</Text>
                     </Text>
                 </View>
             )}
