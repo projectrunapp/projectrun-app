@@ -49,3 +49,12 @@ export function dateStringFormat(dateString: number): string {
 
     return `${month} ${day}, ${year}; ${time}`;
 }
+
+// return example: "2023-08-25"
+export function dateFormat(date: Date): string {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+}

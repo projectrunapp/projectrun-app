@@ -24,6 +24,7 @@ import {
 import Constants from 'expo-constants';
 import RNDateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker
 import PopupMessage from "../components/PopupMessage";
+import {dateFormat} from "../utils/helper";
 
 const AuthScreen = () => {
     const [loading, setLoading] = useState<boolean>(false);
@@ -50,9 +51,6 @@ const AuthScreen = () => {
     const [name, setName] = useState<string>('');
     const [selectedGender, setSelectedGender] = useState<string>(genders[0].value);
 
-    const dateFormat = (date: Date): string => {
-        return `${date.getMonth()}-${date.getDate()}-${date.getFullYear()}`;
-    }
     const [birthDate, setBirthDate] = useState<string>('');
     const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
     const [date, setDate] = useState(new Date(Date.now()));
@@ -161,7 +159,9 @@ const AuthScreen = () => {
                         <TextInput style={styles.input} placeholder="Birth Date" editable={false} value={birthDate}/>
                     </TouchableOpacity>
                     {showDatePicker && (
-                        <RNDateTimePicker value={date} onChange={changeDate}/>
+                        <RNDateTimePicker value={date}
+                                          maximumDate={new Date(Date.now())}
+                                          onChange={changeDate}/>
                     )}
                     <View style={styles.picker_container}>
                         <Picker onValueChange={(itemValue, itemIndex) => setSelectedGender(itemValue)}
@@ -251,13 +251,6 @@ const styles = StyleSheet.create({
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
-    },
-    date_picker: {
-        width: 320,
-        height: 260,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
     },
 });
 

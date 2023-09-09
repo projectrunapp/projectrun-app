@@ -30,10 +30,8 @@ const FriendsScreen = () => {
     const [friends, setFriends] = useState<any>({});
 
     const getUserId = async () => {
-        if (getStorageUser) {
-            const {storageUserId} = await getStorageUser();
-            setAuthUserId(storageUserId);
-        }
+        const {id} = await getStorageUser!();
+        setAuthUserId(id);
     };
 
     const loadFriends = async () => {

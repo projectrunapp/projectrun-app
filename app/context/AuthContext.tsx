@@ -12,13 +12,25 @@ interface AuthProps {
         name: string | null,
         email: string | null,
         username: string | null,
+        birth_date: string | null,
+        gender: string,
     },
     getStorageUser?: () => Promise<{
-        storageUserId: number | null,
-        storageUserName: string | null,
-        storageUserEmail: string | null,
-        storageUserUsername: string | null,
+        id: number | null,
+        name: string | null,
+        email: string | null,
+        username: string | null,
+        birth_date: string | null,
+        gender: string,
     }>,
+    setStorageUser?: (userData: {
+        id?: number,
+        name?: string,
+        email?: string,
+        username?: string,
+        birth_date?: string,
+        gender?: string,
+    }) => Promise<void>,
     onRegister?: (email: string,
                   password: string,
                   username: string,
@@ -43,6 +55,8 @@ export const AuthProvider = ({children}: any) => {
         name: string | null,
         email: string | null,
         username: string | null,
+        birth_date: string | null,
+        gender: string,
     }>({
         authenticated: false,
         token: null,
@@ -50,6 +64,8 @@ export const AuthProvider = ({children}: any) => {
         name: null,
         email: null,
         username: null,
+        birth_date: null,
+        gender: 'unknown',
     });
 
     const getStorageUser = async () => {
@@ -57,25 +73,52 @@ export const AuthProvider = ({children}: any) => {
         const name = await AsyncStorage.getItem('user_name');
         const email = await AsyncStorage.getItem('user_email');
         const username = await AsyncStorage.getItem('user_username');
+        const birth_date = await AsyncStorage.getItem('user_birth_date');
+        const gender = await AsyncStorage.getItem('user_gender');
 
         return {
-            storageUserId: id ? parseInt(id) : null,
-            storageUserName: name,
-            storageUserEmail: email,
-            storageUserUsername: username,
+            id: id ? parseInt(id) : null,
+            name: name,
+            email: email,
+            username: username,
+            birth_date: birth_date,
+            gender: gender
         }
     }
-    const setStorageUser = async (userData) => {
-        await AsyncStorage.setItem('user_id', userData.id.toString());
-        await AsyncStorage.setItem('user_name', userData.name);
-        await AsyncStorage.setItem('user_email', userData.email);
-        await AsyncStorage.setItem('user_username', userData.username);
+    const setStorageUser = async (userData: {
+        id?: number,
+        name?: string,
+        email?: string,
+        username?: string,
+        birth_date?: string,
+        gender?: string,
+    }) => {
+        if (userData.id) {
+            await AsyncStorage.setItem('user_id', userData.id.toString());
+        }
+        if (userData.name) {
+            await AsyncStorage.setItem('user_name', userData.name);
+        }
+        if (userData.email) {
+            await AsyncStorage.setItem('user_email', userData.email);
+        }
+        if (userData.username) {
+            await AsyncStorage.setItem('user_username', userData.username);
+        }
+        if (userData.birth_date) {
+            await AsyncStorage.setItem('user_birth_date', userData.birth_date);
+        }
+        if (userData.gender) {
+            await AsyncStorage.setItem('user_gender', userData.gender);
+        }
     };
     const clearStorageUser = async () => {
         await AsyncStorage.setItem('user_id', '');
         await AsyncStorage.setItem('user_name', '');
         await AsyncStorage.setItem('user_email', '');
         await AsyncStorage.setItem('user_username', '');
+        await AsyncStorage.setItem('user_birth_date', '');
+        await AsyncStorage.setItem('user_gender', '');
     };
 
     const login = async (email: string, password: string) => {
@@ -92,6 +135,8 @@ export const AuthProvider = ({children}: any) => {
                 name: userData.name,
                 email: userData.email,
                 username: userData.username,
+                birth_date: userData.birth_date,
+                gender: userData.gender,
             });
 
             setAuthState({
@@ -101,6 +146,8 @@ export const AuthProvider = ({children}: any) => {
                 name: userData.name,
                 email: userData.email,
                 username: userData.username,
+                birth_date: userData.birth_date,
+                gender: userData.gender,
             });
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
@@ -153,6 +200,8 @@ export const AuthProvider = ({children}: any) => {
             name: null,
             email: null,
             username: null,
+            birth_date: null,
+            gender: 'unknown',
         });
     }
 
@@ -160,20 +209,17 @@ export const AuthProvider = ({children}: any) => {
         const token = await SecureStore.getItemAsync(process.env.JWT_KEY);
         // TODO: load user data (id, email) by extracting JWT token
         if (token) {
-            const {
-                storageUserId,
-                storageUserName,
-                storageUserEmail,
-                storageUserUsername,
-            } = await getStorageUser();
+            const {id, name, email, username, birth_date, gender} = await getStorageUser();
 
             setAuthState({
                 authenticated: true,
                 token: token,
-                id: storageUserId,
-                name: storageUserName,
-                email: storageUserEmail,
-                username: storageUserUsername,
+                id,
+                name,
+                email,
+                username,
+                birth_date,
+                gender: gender || 'unknown',
             });
         }
     };
@@ -186,6 +232,7 @@ export const AuthProvider = ({children}: any) => {
         <AuthContext.Provider value={{
             authState,
             getStorageUser,
+            setStorageUser,
             onRegister: register,
             onLogin: login,
             onLogout: logout,
