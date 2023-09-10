@@ -35,7 +35,9 @@
     "react-native-screens": "~3.22.0",
     "react-native-svg": "13.9.0",
     "victory": "^36.6.11",
-    "victory-native": "^36.6.11"
+    "victory-native": "^36.6.11",
+    "expo-image-picker": "~14.3.2",
+    "expo-file-system": "~15.4.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

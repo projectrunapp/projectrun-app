@@ -1,6 +1,5 @@
 
 import {
-    Image,
     Platform,
     Pressable,
     StyleSheet,
@@ -18,13 +17,13 @@ import {
     activeBtnTextColor,
     appPrimaryColor,
     inactiveBtnTextColor,
-    splashLogoUrl
 } from "../utils/app-constants";
 import RNDateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker
 import PopupMessage from "../components/PopupMessage";
-import axios from "axios/index";
+import axios from "axios";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {dateFormat} from "../utils/helper";
+import ProfileImage from "../components/ProfileImage";
 
 export default function ProfileScreen() {
     const { authState, getStorageUser, setStorageUser } = useAuth();
@@ -48,6 +47,7 @@ export default function ProfileScreen() {
     const [username, setUsername] = useState<string>('');
     const [name, setName] = useState<string>('');
     const [selectedGender, setSelectedGender] = useState<string>(genders[0].value);
+    const [avatar, setAvatar] = useState<string>('');
 
     const [birthDate, setBirthDate] = useState<string>('');
     const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
@@ -103,6 +103,7 @@ export default function ProfileScreen() {
         setName(storageUser.name);
         setBirthDate(storageUser.birth_date);
         setSelectedGender(storageUser.gender);
+        setAvatar(storageUser.avatar);
 
         setDate(new Date(storageUser.birth_date || Date.now()));
     }
@@ -153,7 +154,8 @@ export default function ProfileScreen() {
                               success={popupSuccess}
                               onClose={closePopup}
                 />
-                <Image source={{uri: splashLogoUrl}} style={styles.image} alt="Logo"/>
+
+                <ProfileImage avatar={avatar} setAvatar={setAvatar} showPopup={showPopup} />
 
                 <View style={styles.form}>
                     <TextInput style={[styles.input, styles.input_disabled]} placeholder="Email"
@@ -196,9 +198,9 @@ export default function ProfileScreen() {
 
                 </View>
 
-                <View style={styles.logout_button_container}>
-                    <Pressable onPress={logoutPrompt} style={styles.logout_button}>
-                        <Text style={styles.logout_button_text}>Log out</Text>
+                <View style={styles.logout_btn_container}>
+                    <Pressable onPress={logoutPrompt} style={styles.logout_btn}>
+                        <Text style={styles.logout_btn_text}>Log out</Text>
                         <MaterialCommunityIcons name="logout" size={24} color="#fff" />
                     </Pressable>
                 </View>
@@ -216,11 +218,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         padding: 10,
-    },
-    image: {
-        width: 100,
-        height: 100,
-        margin: 10,
     },
     form: {
         gap: 10,
@@ -268,12 +265,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         letterSpacing: 0.25,
     },
-    logout_button_container: {
+    logout_btn_container: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
         margin: 20,
     },
-    logout_button: {
+    logout_btn: {
         backgroundColor: '#c10',
         padding: 10,
         borderRadius: 5,
@@ -283,7 +280,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         elevation: 3,
     },
-    logout_button_text: {
+    logout_btn_text: {
         color: '#fff',
         fontWeight: 'bold',
     },

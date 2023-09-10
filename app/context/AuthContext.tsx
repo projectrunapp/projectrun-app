@@ -14,6 +14,7 @@ interface AuthProps {
         username: string | null,
         birth_date: string | null,
         gender: string,
+        avatar: string | null,
     },
     getStorageUser?: () => Promise<{
         id: number | null,
@@ -22,6 +23,7 @@ interface AuthProps {
         username: string | null,
         birth_date: string | null,
         gender: string,
+        avatar: string | null,
     }>,
     setStorageUser?: (userData: {
         id?: number,
@@ -30,6 +32,7 @@ interface AuthProps {
         username?: string,
         birth_date?: string,
         gender?: string,
+        avatar?: string,
     }) => Promise<void>,
     onRegister?: (email: string,
                   password: string,
@@ -57,6 +60,7 @@ export const AuthProvider = ({children}: any) => {
         username: string | null,
         birth_date: string | null,
         gender: string,
+        avatar: string | null,
     }>({
         authenticated: false,
         token: null,
@@ -66,6 +70,7 @@ export const AuthProvider = ({children}: any) => {
         username: null,
         birth_date: null,
         gender: 'unknown',
+        avatar: null,
     });
 
     const getStorageUser = async () => {
@@ -75,6 +80,7 @@ export const AuthProvider = ({children}: any) => {
         const username = await AsyncStorage.getItem('user_username');
         const birth_date = await AsyncStorage.getItem('user_birth_date');
         const gender = await AsyncStorage.getItem('user_gender');
+        const avatar = await AsyncStorage.getItem('user_avatar');
 
         return {
             id: id ? parseInt(id) : null,
@@ -82,7 +88,8 @@ export const AuthProvider = ({children}: any) => {
             email: email,
             username: username,
             birth_date: birth_date,
-            gender: gender
+            gender: gender,
+            avatar: avatar,
         }
     }
     const setStorageUser = async (userData: {
@@ -92,6 +99,7 @@ export const AuthProvider = ({children}: any) => {
         username?: string,
         birth_date?: string,
         gender?: string,
+        avatar?: string,
     }) => {
         if (userData.id) {
             await AsyncStorage.setItem('user_id', userData.id.toString());
@@ -111,6 +119,9 @@ export const AuthProvider = ({children}: any) => {
         if (userData.gender) {
             await AsyncStorage.setItem('user_gender', userData.gender);
         }
+        if (userData.avatar) {
+            await AsyncStorage.setItem('user_avatar', userData.avatar);
+        }
     };
     const clearStorageUser = async () => {
         await AsyncStorage.setItem('user_id', '');
@@ -119,6 +130,7 @@ export const AuthProvider = ({children}: any) => {
         await AsyncStorage.setItem('user_username', '');
         await AsyncStorage.setItem('user_birth_date', '');
         await AsyncStorage.setItem('user_gender', '');
+        await AsyncStorage.setItem('user_avatar', '');
     };
 
     const login = async (email: string, password: string) => {
@@ -137,6 +149,7 @@ export const AuthProvider = ({children}: any) => {
                 username: userData.username,
                 birth_date: userData.birth_date,
                 gender: userData.gender,
+                avatar: userData.avatar,
             });
 
             setAuthState({
@@ -148,6 +161,7 @@ export const AuthProvider = ({children}: any) => {
                 username: userData.username,
                 birth_date: userData.birth_date,
                 gender: userData.gender,
+                avatar: userData.avatar,
             });
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
@@ -202,6 +216,7 @@ export const AuthProvider = ({children}: any) => {
             username: null,
             birth_date: null,
             gender: 'unknown',
+            avatar: null,
         });
     }
 
@@ -209,7 +224,7 @@ export const AuthProvider = ({children}: any) => {
         const token = await SecureStore.getItemAsync(process.env.JWT_KEY);
         // TODO: load user data (id, email) by extracting JWT token
         if (token) {
-            const {id, name, email, username, birth_date, gender} = await getStorageUser();
+            const {id, name, email, username, birth_date, gender, avatar} = await getStorageUser();
 
             setAuthState({
                 authenticated: true,
@@ -220,6 +235,7 @@ export const AuthProvider = ({children}: any) => {
                 username,
                 birth_date,
                 gender: gender || 'unknown',
+                avatar,
             });
         }
     };

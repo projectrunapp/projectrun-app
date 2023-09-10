@@ -2,11 +2,12 @@
 import {Image, StyleSheet, Text, View} from "react-native";
 
 const ListUserItem = ({ item, actionButtons }: any) => {
-    // TODO: add avatar to user
+    // TODO: change to default avatar
     return (
         <View style={styles.list_item}>
-            <Image style={styles.user_avatar} alt="Avatar"
-                   source={{uri: `https://picsum.photos/id/${item.id}/50/50`}}/>
+            <Image source={{
+                uri: item.avatar ? item.avatar : `https://picsum.photos/id/${item.id}/50/50`
+            }} style={styles.user_avatar}/>
             <View style={styles.user_info_container}>
                 <Text style={[styles.user_info, styles.user_info_name]}>{item.name.length > 23 ? item.name.substring(0, 20) + '...' : item.name}</Text>
                 <Text style={[styles.user_info, styles.user_info_username]}>@{item.username}</Text>

@@ -39,7 +39,14 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow ProjectApp to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Allow $(APP_NAME) to access your location",
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photoPermission": "Select and upload a photo",
+          "cameraPermission": "Allow $(APP_NAME) to take a picture"
         }
       ]
     ]
