@@ -79,7 +79,7 @@ export default function RunProcessingPopup({
         <Modal visible={isVisible}
                // onRequestClose={onClose}
                animationType="slide"
-               transparent={true}>
+               transparent={false}>
             <View style={styles.full_screen_container}>
                 <View style={styles.popup}>
                     <Text style={styles.text}>

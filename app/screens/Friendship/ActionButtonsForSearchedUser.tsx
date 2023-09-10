@@ -212,10 +212,14 @@ const ActionButtonsForSearchedUser = ({item, showPopup}) => {
                 (friendship === 'friend_request_received')
             ) && (
                 <>
-                    <TouchableOpacity style={styles.accept_button} onPress={() => onPressAccept()}>
+                    <TouchableOpacity style={[styles.button_action, {
+                        backgroundColor: 'green',
+                    }]} onPress={() => onPressAccept()}>
                         <MaterialCommunityIcons name="check" size={24} style={{color: 'white'}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.decline_button} onPress={() => onPressDecline()}>
+                    <TouchableOpacity style={[styles.button_action, {
+                        backgroundColor: 'red',
+                    }]} onPress={() => onPressDecline()}>
                         <MaterialCommunityIcons name="close" size={24} style={{color: 'white'}}/>
                     </TouchableOpacity>
                 </>
@@ -225,7 +229,9 @@ const ActionButtonsForSearchedUser = ({item, showPopup}) => {
                 ((friendship === 'default') && (item.received.length > 0 && item.received[0].status === 'PENDING')) ||
                 (friendship === 'friend_request_sent')
             ) && (
-                <TouchableOpacity style={styles.cancel_button} onPress={() => onPressCancel()}>
+                <TouchableOpacity style={[styles.button_action, {
+                    backgroundColor: 'red',
+                }]} onPress={() => onPressCancel()}>
                     <MaterialCommunityIcons name="close" size={24} style={{color: 'white'}}/>
                 </TouchableOpacity>
             )}
@@ -234,7 +240,9 @@ const ActionButtonsForSearchedUser = ({item, showPopup}) => {
                 ((friendship === 'default') && ((item.sent.length > 0 && item.sent[0].status === 'ACCEPTED') || (item.received.length > 0 && item.received[0].status === 'ACCEPTED'))) ||
                 (friendship === 'friends')
             ) && (
-                <TouchableOpacity style={styles.unfriend_button} onPress={() => onPressUnfriend()}>
+                <TouchableOpacity style={[styles.button_action, {
+                    backgroundColor: 'red',
+                }]} onPress={() => onPressUnfriend()}>
                     <MaterialCommunityIcons name="account-remove" size={24} style={{color: 'white'}}/>
                 </TouchableOpacity>
             )}
@@ -243,7 +251,9 @@ const ActionButtonsForSearchedUser = ({item, showPopup}) => {
                 ((friendship === 'default') && (item.sent.length === 0 && item.received.length === 0)) ||
                 (friendship === 'none')
             ) && (
-                <TouchableOpacity style={styles.send_friend_request_button} onPress={() => onPressSendFriendRequest()}>
+                <TouchableOpacity style={[styles.button_action, {
+                    backgroundColor: 'green',
+                }]} onPress={() => onPressSendFriendRequest()}>
                     <MaterialCommunityIcons name="account-plus" size={24} style={{color: 'white'}}/>
                 </TouchableOpacity>
             )}
@@ -258,31 +268,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         alignItems: 'center',
     },
-    accept_button: {
-        backgroundColor: 'green',
+    button_action: {
         borderRadius: 5,
         padding: 5,
-        marginRight: 5,
-    },
-    decline_button: {
-        backgroundColor: 'red',
-        borderRadius: 5,
-        padding: 5,
-    },
-    cancel_button: {
-        backgroundColor: 'red',
-        borderRadius: 5,
-        padding: 5,
-    },
-    unfriend_button: {
-        backgroundColor: 'red',
-        borderRadius: 5,
-        padding: 5,
-    },
-    send_friend_request_button: {
-        backgroundColor: 'green',
-        borderRadius: 5,
-        padding: 5,
+        marginLeft: 5,
     },
 });
 
