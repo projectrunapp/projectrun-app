@@ -6,9 +6,11 @@ import {
     runStates,
     stopRunBtnPressSeconds
 } from "../utils/app-constants";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {useRunData} from "../context/RunDataContext";
+import {useIsFocused} from "@react-navigation/native";
+import {humanizedAvgSpeed, humanizedDistance, humanizedDuration} from "../utils/helper";
 
 export default function RunProcessingPopup({
                                                isVisible,
@@ -18,9 +20,16 @@ export default function RunProcessingPopup({
                                                setRunState,
                                                runStartedAt,
                                                stopRunProcessing,
-                                               stopRunLoading
+                                               stopRunLoading,
+                                               runningResults,
+                                               runTitle,
                                            }) {
     const { storageSetRunState } = useRunData();
+
+    let intervalId = null;
+    const isFocused = useIsFocused();
+    const [runningTime, setRunningTime] = useState<number>(0);
+    const [timeWithPauses, setTimeWithPauses] = useState<number>(0);
 
     const pauseOrResume = () => {
         // check that the "Pause" ("Resume") button hasn't pressed automatically after holding the "Start" button
@@ -75,6 +84,29 @@ export default function RunProcessingPopup({
         setIsStopBtnPressed(false);
     };
 
+    useEffect(() => {
+        if (isFocused) {
+            if (runState === runStates.RUNNING || runState === runStates.PAUSED) {
+                intervalId = setInterval(() => {
+                    setTimeWithPauses(prevState => prevState + 1);
+                    if (runState === runStates.RUNNING) {
+                        setRunningTime(prevState => prevState + 1);
+                    }
+                }, 1000);
+            } else {
+                clearInterval(intervalId);
+                setRunningTime(0);
+                setTimeWithPauses(0);
+            }
+        } else {
+            clearInterval(intervalId);
+            setRunningTime(0);
+            setTimeWithPauses(0);
+        }
+
+        return () => clearInterval(intervalId);
+    }, [runState, isFocused]);
+
     return (
         <Modal visible={isVisible}
                // onRequestClose={onClose}
@@ -82,9 +114,7 @@ export default function RunProcessingPopup({
                transparent={false}>
             <View style={styles.full_screen_container}>
                 <View style={styles.popup}>
-                    <Text style={styles.text}>
-                        Morning Run!
-                    </Text>
+                    <Text style={styles.text}>{runTitle}</Text>
                     <Text style={{fontSize: 18, marginBottom: 16}}>
                         {isStopBtnPressed ? (
                             (stopCountdownSeconds === 0) ?
@@ -128,6 +158,27 @@ export default function RunProcessingPopup({
                             </View>
                         </View>
                     )}
+
+                    <View style={styles.running_info_container}>
+                        <Text style={styles.running_info}>
+                            Distance: <Text>{humanizedDistance(runningResults.distance)}</Text>
+                        </Text>
+                        {/*<Text style={styles.running_info}>*/}
+                        {/*    Duration: {humanizedDuration(runningResults.duration)}*/}
+                        {/*</Text>*/}
+                        <Text style={styles.running_info}>
+                            Average Speed: {humanizedAvgSpeed(runningResults.avg_speed)}
+                        </Text>
+
+                        <Text style={styles.running_info}>
+                            Running Time: {humanizedDuration(runningTime)}
+                        </Text>
+
+                        <Text style={styles.running_info}>
+                            Time with pauses: {humanizedDuration(timeWithPauses)}
+                        </Text>
+                    </View>
+
                 </View>
             </View>
         </Modal>
@@ -163,6 +214,12 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         width: 100,
         height: 100,
+    },
+    running_info_container: {
+        marginTop: 20,
+    },
+    running_info: {
+        fontSize: 18,
     },
     loading_container: {
         flex: 1,

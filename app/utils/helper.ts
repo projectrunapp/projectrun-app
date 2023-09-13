@@ -58,3 +58,44 @@ export function dateFormat(date: Date): string {
 
     return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
 }
+
+export function humanizedDistance(distanceInMeters: number): string {
+    if (distanceInMeters < 1000) {
+        return `${distanceInMeters} m`;
+    } else {
+        return `${(distanceInMeters / 1000).toFixed(1)} km`;
+    }
+}
+export function humanizedDistancePartials(distanceInMeters: number) {
+    return {
+        km: Math.floor(distanceInMeters / 1000),
+        m: Math.round(distanceInMeters % 1000),
+    };
+}
+export function humanizedDuration(durationInSeconds: number): string {
+    const hours = Math.floor(durationInSeconds / 3600);
+    const minutes = Math.floor((durationInSeconds - (hours * 3600)) / 60);
+    const seconds = durationInSeconds - (hours * 3600) - (minutes * 60);
+
+    if (hours > 0) {
+        return `${hours}h ${minutes}m ${seconds}s`;
+    }
+    if (minutes > 0) {
+        return `${minutes}m ${seconds}s`;
+    }
+    return `${seconds}s`;
+}
+export function humanizedDurationPartials(durationInSeconds: number) {
+    const hours = Math.floor(durationInSeconds / 3600);
+    const minutes = Math.floor((durationInSeconds - (hours * 3600)) / 60);
+    const seconds = durationInSeconds - (hours * 3600) - (minutes * 60);
+
+    return {
+        h: hours,
+        m: minutes,
+        s: seconds,
+    };
+}
+export function humanizedAvgSpeed(avgSpeedMetersPerSeconds: number): string {
+    return `${(avgSpeedMetersPerSeconds * 3.6).toFixed(1)} km/h`;
+}

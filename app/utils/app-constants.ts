@@ -19,15 +19,13 @@ export const updateLocationTimeoutSeconds = 10; // 10-30
 export const startRunBtnPressSeconds = 3;
 export const stopRunBtnPressSeconds = 3;
 export const guaranteeSecondsAfterStartBtnPress = 3;
-export const runStates = {
-    NOT_STARTED: 0,
-    RUNNING: 1,
-    PAUSED: 2,
-    FINISHED: 3,
-};
-export const runStateTitles = {
-    0: 'Not Started',
-    1: 'Running',
-    2: 'Paused',
-    3: 'Finished',
+export const runStates = {NOT_STARTED: 0, RUNNING: 1, PAUSED: 2, FINISHED: 3};
+export const runStateTitles = {0: "Not Started", 1: "Running", 2: "Paused", 3: "Finished"};
+
+// TODO: default values; make this editable from settings
+export const voiceNotification = {
+    enabled: true, // true (default) | false
+    by: 'time', // distance (default) | time
+    each_distance: 1000, // meters - 100 | 500 | 1000 (default)
+    each_time: 60, // seconds - 60 | 600 (default) | 1800 | 3600
 };

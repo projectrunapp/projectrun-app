@@ -5,7 +5,7 @@ import { createContext, useContext } from 'react';
 import {calculateDistanceInMeters, generateRunTitle} from "../utils/helper";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import {runStates} from "../utils/app-constants";
+import {runStates, voiceNotification} from "../utils/app-constants";
 
 const RunDataContext = createContext({});
 
@@ -21,6 +21,7 @@ export const RunDataProvider = ({ children }: any) => {
     `runs_count` - number of runs
     `run_state` - see runStates in app-constants.ts
     `run_coordinates_{runNumber}` - array of coordinates of a run
+    `voice_notification_info` - info about voice notification
 
     RUNS SCHEMA EXAMPLE:
     [
@@ -49,6 +50,12 @@ export const RunDataProvider = ({ children }: any) => {
       },
       ...
     ]
+
+    RUNS_COUNT SCHEMA EXAMPLE:
+    1
+
+    RUN_STATE SCHEMA EXAMPLE:
+    1
 
     RUN_COORDINATES_<runNumber> SCHEMA EXAMPLE:
     [
@@ -86,6 +93,15 @@ export const RunDataProvider = ({ children }: any) => {
         "avg_speed_total_pauses_included": 7.5
       }
     ]
+
+    VOICE_NOTIFICATION_INFO SCHEMA EXAMPLE:
+    {
+        "enabled": true,
+        "by": "distance",
+        "notified": false,
+        "next_distance": 1000,
+        "next_time": 600
+    }
     */
 
     const storageGetRunState = async (): Promise<number> => {
@@ -102,7 +118,13 @@ export const RunDataProvider = ({ children }: any) => {
         await AsyncStorage.setItem('run_state', runState.toString());
     }
 
-    const storageCreateRun = async () => {
+    const storageCreateRun = async (): Promise<{
+        success: boolean,
+        message: string,
+        data?: {
+            title: string,
+        },
+    }> => {
         const storageRunState = await storageGetRunState();
         if (storageRunState === runStates.RUNNING || storageRunState === runStates.PAUSED) {
             // console.info("Storage run state is already running or paused!");
@@ -121,6 +143,8 @@ export const RunDataProvider = ({ children }: any) => {
             runs = JSON.parse(runsJson);
         }
 
+        const runTitle = generateRunTitle(date.getHours());
+
         await AsyncStorage.setItem('runs', JSON.stringify([...runs, {
             run_number: runsCount + 1,
             timestamp_started: unixTimeInSecond,
@@ -128,7 +152,7 @@ export const RunDataProvider = ({ children }: any) => {
             coordinates_count: 0, // coordinatesCount
             first_coordinate: null,
             last_coordinate: null,
-            title: generateRunTitle(date.getHours()),
+            title: runTitle,
             pauses_count: 0, // pausesCount
             distance: 0, // distance
             distance_pauses_included: 0, // distancePausesIncluded
@@ -143,10 +167,22 @@ export const RunDataProvider = ({ children }: any) => {
 
         // set run state to running
         await storageSetRunState(runStates.RUNNING);
+
+        return {
+            success: true,
+            message: "Run created.",
+            data: {
+                title: runTitle,
+            },
+        };
     }
 
     // add coordinate to "run_coordinates_{runNumber}"
-    const storageAddRunCoordinate = async (lat: number, lng: number, isActive: boolean) => {
+    const storageAddRunCoordinate = async (lat: number, lng: number, isActive: boolean): Promise<{
+        distance: number,
+        duration: number,
+        avg_speed: number,
+    }> => {
         const storageRunState = await storageGetRunState();
         if (storageRunState !== runStates.RUNNING && storageRunState !== runStates.PAUSED) {
             // console.info("Storage run state is not running or paused!");
@@ -161,7 +197,8 @@ export const RunDataProvider = ({ children }: any) => {
             runCoordinates = [],
             distance = 0, distancePausesIncluded = 0, distancePiece = 0,
             duration = 0, durationPausesIncluded = 0, durationPiece = 0,
-            avgSpeed = 0, avgSpeedPausesIncluded = 0, avgSpeedPiece = 0;
+            avgSpeed = 0, avgSpeedPausesIncluded = 0, avgSpeedPiece = 0,
+            resultDistance = 0, resultDuration = 0, resultAvgSpeed = 0;
 
         const runsCount = await storageGetRunsCount();
 
@@ -174,9 +211,6 @@ export const RunDataProvider = ({ children }: any) => {
 
         const runIndex = runsCount - 1;
         // runs[runIndex].run_number is the same as runsCount;
-
-        // updateAt
-        runs[runIndex].timestamp_last_updated = unixTimeInSecond;
 
         // coordinates_count
         const coordinatesCount = parseInt(runs[runIndex].coordinates_count);
@@ -215,6 +249,9 @@ export const RunDataProvider = ({ children }: any) => {
             if (isActive) {
                 distance = parseInt(runs[runIndex].distance) + distancePiece;
                 runs[runIndex].distance = distance;
+                resultDistance = distance;
+            } else {
+                resultDistance = parseInt(runs[runIndex].distance);
             }
             distancePausesIncluded = parseInt(runs[runIndex].distance_pauses_included) + distancePiece;
             runs[runIndex].distance_pauses_included = distancePausesIncluded;
@@ -224,17 +261,27 @@ export const RunDataProvider = ({ children }: any) => {
             if (isActive) {
                 duration = parseInt(runs[runIndex].duration) + durationPiece;
                 runs[runIndex].duration = duration;
+                resultDuration = duration;
+            } else {
+                resultDuration = parseInt(runs[runIndex].duration);
             }
             durationPausesIncluded = parseInt(runs[runIndex].duration_pauses_included) + durationPiece;
             runs[runIndex].duration_pauses_included = durationPausesIncluded;
 
+            // updateAt
+            runs[runIndex].timestamp_last_updated = unixTimeInSecond;
+
             // avg_speed_piece & avg_speed & avg_speed_pauses_included
+            // TODO: calculate in km/h
             avgSpeedPiece = Math.round((distancePiece / durationPiece) * 100) / 100;
             if (isActive) {
-                avgSpeed = Math.round((runs[runIndex].duration / runs[runIndex].distance) * 100) / 100;
+                avgSpeed = Math.round(parseInt(runs[runIndex].distance) / parseInt(runs[runIndex].duration) * 100) / 100;
                 runs[runIndex].avg_speed = avgSpeed;
+                resultAvgSpeed = avgSpeed;
+            } else {
+                resultAvgSpeed = Math.round(parseInt(runs[runIndex].distance) / parseInt(runs[runIndex].duration) * 100) / 100;
             }
-            avgSpeedPausesIncluded = Math.round((runs[runIndex].duration_pauses_included / runs[runIndex].distance_pauses_included) * 100) / 100;
+            avgSpeedPausesIncluded = Math.round(parseInt(runs[runIndex].duration_pauses_included) / parseInt(runs[runIndex].distance_pauses_included) * 100) / 100;
             runs[runIndex].avg_speed_pauses_included = avgSpeedPausesIncluded;
         }
 
@@ -268,11 +315,62 @@ export const RunDataProvider = ({ children }: any) => {
             avg_speed_pauses_included: avgSpeedPausesIncluded,
         });
         await AsyncStorage.setItem(`run_coordinates_${runsCount}`, JSON.stringify(runCoordinates));
+
+        return {
+            distance: resultDistance,
+            duration: resultDuration,
+            avg_speed: resultAvgSpeed,
+        };
     }
 
     // stop run by making run state to NOT_STARTED
-    const storageStopRun = async () => {
+    const storageStopRun = async (): Promise<{
+        success: boolean,
+        message: string,
+        data?: {
+            distance: number,
+            duration: number,
+            avg_speed: number,
+        }
+    }> => {
+        // get the last received distance, duration, avg_speed by the last coordinate
+        const storageRunState = await storageGetRunState();
+        if (storageRunState !== runStates.RUNNING && storageRunState !== runStates.PAUSED) {
+            return {
+                success: false,
+                message: "Storage run state is not running or paused!",
+            };
+        }
+
+        const runsCount = await storageGetRunsCount();
+        const runCoordinatesJson = await AsyncStorage.getItem(`run_coordinates_${runsCount}`);
+        if (!runCoordinatesJson) {
+            return {
+                success: false,
+                message: "No run coordinates in storage!",
+            }
+        }
+
+        const runCoordinates = JSON.parse(runCoordinatesJson);
+        const lastCoordinate = runCoordinates[runCoordinates.length - 1];
+        const distance = lastCoordinate.distance;
+        const duration = lastCoordinate.duration;
+        const avgSpeed = lastCoordinate.avg_speed;
+
         await storageSetRunState(runStates.NOT_STARTED);
+
+        // clear voice_notification_info
+        await AsyncStorage.removeItem('voice_notification_info');
+
+        return {
+            success: true,
+            message: "Run stopped.",
+            data: {
+                distance,
+                duration,
+                avg_speed: avgSpeed,
+            }
+        };
     }
 
     // get runs from "runs"
@@ -379,6 +477,48 @@ export const RunDataProvider = ({ children }: any) => {
         await storageSetRunState(runStates.NOT_STARTED);
     }
 
+    const storageVoiceNotificationInfo = async (distance: number, duration: number): Promise<boolean> => {
+        let existingInfo;
+        const voiceNotificationInfoJson = await AsyncStorage.getItem('voice_notification_info');
+        if (voiceNotificationInfoJson) {
+            existingInfo = JSON.parse(voiceNotificationInfoJson);
+            if (!existingInfo.enabled) {
+                return false;
+            }
+
+            let needToNotify = false;
+            if (distance >= parseInt(existingInfo.next_distance)) {
+                if (voiceNotification.by === 'distance' && !existingInfo.notified) {
+                    needToNotify = true;
+                }
+                existingInfo.next_distance = parseInt(existingInfo.next_distance) + voiceNotification.each_distance;
+            }
+            if (duration >= parseInt(existingInfo.next_time)) {
+                if (voiceNotification.by === 'time' && !existingInfo.notified) {
+                    needToNotify = true;
+                }
+                existingInfo.next_time = parseInt(existingInfo.next_time) + voiceNotification.each_time;
+            }
+
+            existingInfo.notified = needToNotify;
+
+            await AsyncStorage.setItem('voice_notification_info', JSON.stringify(existingInfo));
+
+            return needToNotify;
+        } else {
+            existingInfo = {
+                enabled: voiceNotification.enabled, // true or false
+                by: voiceNotification.by, // 'distance' or 'time'
+                notified: false,
+                next_distance: voiceNotification.each_distance, // meters
+                next_time: voiceNotification.each_time, // seconds
+            };
+            await AsyncStorage.setItem('voice_notification_info', JSON.stringify(existingInfo));
+
+            return false;
+        }
+    }
+
 
 
     // check if there is internet connection, if yes, send all runs and its coordinates to server flush them from local storage
@@ -461,6 +601,7 @@ export const RunDataProvider = ({ children }: any) => {
             storageUpdateRun,
             storageDeleteRun,
             storageGetAllRunsData,
+            storageVoiceNotificationInfo,
             sendAllRunsDataToServer,
         }}>
             {children}
