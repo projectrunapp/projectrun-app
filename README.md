@@ -67,6 +67,49 @@ expo start --dev-client
 
 
 
+#### Info:
+
+- Run this to get audio file duration:
+```shell
+ffprobe -i <file> -show_entries format=duration -v quiet -of csv="p=0"
+```
+
+or make a shell script to get the duration of all the audio files in a directory:
+```shell
+nano audio-duration.sh
+```
+
+```shell
+#!/bin/bash
+
+# Specify the directory containing your audio files
+directory="audio"
+
+# Loop through all the files in the directory
+for file in "$directory"/*; do
+  # Check if the file is a regular file (not a directory)
+  if [ -f "$file" ]; then
+    # Use ffprobe to get the audio duration for the file
+    duration=$(ffprobe -i "$file" -show_entries format=duration -v quiet -of csv="p=0")
+    
+    # Print the filename and its corresponding duration
+    echo "File: $file, Duration: $duration seconds"
+  fi
+done
+```
+
+- make it executable:
+```shell
+chmod +x audio-duration.sh
+```
+
+- run it:
+```shell
+./audio-duration.sh
+```
+
+
+
 #### Useful Resources:
 
 - Expo [Environment variables and secrets in EAS Build](https://docs.expo.dev/build-reference/variables)
