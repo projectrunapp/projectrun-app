@@ -179,14 +179,20 @@ export const RunDataProvider = ({ children }: any) => {
 
     // add coordinate to "run_coordinates_{runNumber}"
     const storageAddRunCoordinate = async (lat: number, lng: number, isActive: boolean): Promise<{
-        distance: number,
-        duration: number,
-        avg_speed: number,
+        success: boolean,
+        message: string,
+        data?: {
+            distance: number,
+            duration: number,
+            avg_speed: number,
+        },
     }> => {
         const storageRunState = await storageGetRunState();
         if (storageRunState !== runStates.RUNNING && storageRunState !== runStates.PAUSED) {
-            // console.info("Storage run state is not running or paused!");
-            return;
+            return {
+                success: false,
+                message: "Storage run state is not running or paused!",
+            };
         }
 
         const date = new Date();
@@ -317,9 +323,13 @@ export const RunDataProvider = ({ children }: any) => {
         await AsyncStorage.setItem(`run_coordinates_${runsCount}`, JSON.stringify(runCoordinates));
 
         return {
-            distance: resultDistance,
-            duration: resultDuration,
-            avg_speed: resultAvgSpeed,
+            success: true,
+            message: "Run coordinate added.",
+            data: {
+                distance: resultDistance,
+                duration: resultDuration, // TODO: fix for runs with pauses
+                avg_speed: resultAvgSpeed,
+            },
         };
     }
 

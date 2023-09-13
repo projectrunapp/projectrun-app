@@ -47,7 +47,7 @@ export default function RunScreen() {
 
     const [runTitle, setRunTitle] = useState<string>("Run!");
 
-    const [runningResults, setRunningResults] = useState<{ distance: number, duration: number, avg_speed: number, }>({
+    const [runningResults, setRunningResults] = useState<{distance: number, duration: number, avg_speed: number}>({
         distance: 0,
         duration: 0,
         avg_speed: 0,
@@ -183,18 +183,14 @@ export default function RunScreen() {
         const storageRunState = await storageGetRunState();
         if (storageRunState === runStates.RUNNING || storageRunState === runStates.PAUSED) {
             const result = await storageAddRunCoordinate(lat, lng, storageRunState);
-            if (result) {
-                setRunningResults({
-                    distance: result.distance, // meters
-                    duration: result.duration, // seconds
-                    avg_speed: result.avg_speed, // meters per second
-                });
-            }
+            if (result.success) {
+                setRunningResults(result.data);
 
-            const needToNotify = await storageVoiceNotificationInfo(result.distance, result.duration);
-            if (needToNotify) {
-                const voices = collectVoices(result, []);
-                playSequentialSounds(voices);
+                const needToNotify = await storageVoiceNotificationInfo(result.data.distance, result.data.duration);
+                if (needToNotify) {
+                    const voices = collectVoices(result.data, []);
+                    playSequentialSounds(voices);
+                }
             }
         }
     }
