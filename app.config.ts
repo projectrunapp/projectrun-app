@@ -1,20 +1,19 @@
 
-import { ExpoConfig, ConfigContext } from '@expo/config';
-
-export default ({ config }: ConfigContext): ExpoConfig => ({
-    ...config,
-    name: "ProjectRun",
-    slug: "ProjectRunApp",
-    android: {
-        adaptiveIcon: {
-            foregroundImage: "./assets/app-adaptive-icon.png",
-            backgroundColor: "#ffffff"
+module.exports = ({ config }) => {
+    return {
+        ...config,
+        android: {
+            ...config.android,
+            config: {
+                googleMaps: {
+                    apiKey: process.env.GOOGLE_MAPS_API_KEY
+                }
+            }
         },
-        package: "com.boolfalse.ProjectRunApp",
-        config: {
-            googleMaps: {
-                apiKey: process.env.GOOGLE_MAPS_API_KEY
+        extra: {
+            eas: {
+                projectId: process.env.EXPO_PROJECT_ID
             }
         }
-    },
-});
+    };
+};
