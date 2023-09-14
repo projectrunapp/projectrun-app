@@ -47,18 +47,21 @@ export default function RunScreen() {
 
     const [runTitle, setRunTitle] = useState<string>("Run!");
 
-    const [runningResults, setRunningResults] = useState<{distance: number, duration: number, avg_speed: number}>({
-        distance: 0,
-        duration: 0,
-        avg_speed: 0,
-    });
+    const defaultRunningResults = {distance: 0, duration: 0, avg_speed: 0};
+    const [runningResults, setRunningResults] = useState<{
+        distance: number,
+        duration: number,
+        avg_speed: number
+    }>(defaultRunningResults);
     const [sound, setSound] = useState();
     const playSound = async (fileName: string) => {
-        const requireAudioFile = audioFiles[fileName].file;
-        const { sound: currentSound } = await Audio.Sound.createAsync(requireAudioFile);
-        setSound!(currentSound);
+        if (audioFiles[fileName]) {
+            const requireAudioFile = audioFiles[fileName].file;
+            const { sound: currentSound } = await Audio.Sound.createAsync(requireAudioFile);
+            setSound!(currentSound);
 
-        await currentSound.playAsync();
+            await currentSound.playAsync();
+        }
     }
     const sleep = async (ms) => {
         return new Promise((r) => setTimeout(r, ms));
@@ -81,28 +84,31 @@ export default function RunScreen() {
         result: { distance: number, duration: number, avg_speed: number},
         voices: string[] = []
     ): string[] => {
-        const silenceAudio = "silence-2";
+        const silenceAudio = "silence-1";
         voices.push(silenceAudio);
 
         // distance
         const distancePartials = humanizedDistancePartials(result.distance);
         voices.push("distance");
-        if (distancePartials.km === 0 && distancePartials.m === 0) {
+        if (distancePartials.km === 0 && distancePartials.hundreds === 0 && distancePartials.ddm === 0) {
             voices.push("0");
-            voices.push('meters');
         }
         if (distancePartials.km > 0) {
             voices.push(distancePartials.km.toString());
             if (distancePartials.km === 1) {
-                voices.push('kilometer');
+                voices.push("kilometer");
             } else {
-                voices.push('kilometers');
+                voices.push("kilometers");
             }
         }
-        if (distancePartials.m > 0) {
-            voices.push(distancePartials.m.toString());
-            voices.push('meters');
+        if (distancePartials.hundreds > 0) {
+            voices.push(distancePartials.hundreds.toString());
+            voices.push("hundred");
         }
+        if (distancePartials.ddm > 0) {
+            voices.push(distancePartials.ddm.toString());
+        }
+        voices.push("meters");
 
         if (voices[voices.length - 1] !== silenceAudio) {voices.push(silenceAudio);}
 
@@ -111,30 +117,30 @@ export default function RunScreen() {
         voices.push("time");
         if (durationPartials.h === 0 && durationPartials.m === 0 && durationPartials.s === 0) {
             voices.push("0");
-            voices.push('seconds');
+            voices.push("seconds");
         }
         if (durationPartials.h > 0) {
             voices.push(durationPartials.h.toString());
             if (durationPartials.h === 1) {
-                voices.push('hour');
+                voices.push("hour");
             } else {
-                voices.push('hours');
+                voices.push("hours");
             }
         }
         if (durationPartials.m > 0) {
             voices.push(durationPartials.m.toString());
             if (durationPartials.m === 1) {
-                voices.push('minute');
+                voices.push("minute");
             } else {
-                voices.push('minutes');
+                voices.push("minutes");
             }
         }
         if (durationPartials.s > 0) {
             voices.push(durationPartials.s.toString());
             if (durationPartials.s === 1) {
-                voices.push('second');
+                voices.push("second");
             } else {
-                voices.push('seconds');
+                voices.push("seconds");
             }
         }
 
@@ -143,19 +149,34 @@ export default function RunScreen() {
         // avg_speed
         if (result.avg_speed > 0) {
             voices.push("average-speed");
-            if (result.avg_speed % 1 !== 0) { // if result.avg_speed is float
-                const avgSpeedPartials = result.avg_speed.toString().split('.');
 
-                const avgSpeedPartialsBeforeDot = avgSpeedPartials[0];
-                voices.push(avgSpeedPartialsBeforeDot.toString());
+            // TODO: remove this block (just another implementation of the same logic)
+            // if (result.avg_speed % 1 !== 0) { // if result.avg_speed is float
+            //     const avgSpeedPartials = result.avg_speed.toString().split('.');
+            //
+            //     const avgSpeedPartialsBeforeDot = avgSpeedPartials[0];
+            //     voices.push(avgSpeedPartialsBeforeDot.toString());
+            //
+            //     voices.push("point");
+            //
+            //     // two digits after the dot will be rounded
+            //     const avgSpeedPartialsAfterDot = avgSpeedPartials[1].slice(0, 3);
+            //     const roundedAfterDot = Math.round(parseInt(avgSpeedPartialsAfterDot) / 10);
+            //
+            //     voices.push(roundedAfterDot.toString());
+            // } else {
+            //     voices.push(result.avg_speed.toString());
+            // }
 
+            const avgSpeed = Math.round(result.avg_speed * 100) / 100;
+            const avgSpeedPartials = avgSpeed.toString().split('.');
+            const avgSpeedPartialsBeforeDot = avgSpeedPartials[0];
+            voices.push(avgSpeedPartialsBeforeDot.toString());
+            if (avgSpeedPartials.length > 1 && avgSpeedPartials[1] !== "00") {
                 voices.push("point");
-
-                const avgSpeedPartialsAfterDot = Math.floor(parseInt(avgSpeedPartials[1]) / 10);
-                voices.push(avgSpeedPartialsAfterDot.toString()); // make sure it's one digit after the dot
-            } else {
-                voices.push(result.avg_speed.toString());
+                voices.push(avgSpeedPartials[1].toString());
             }
+
             voices.push("kilometers-per-hour");
         }
 
@@ -166,6 +187,8 @@ export default function RunScreen() {
 
     const startRunProcessing = async () => {
         setRunState(runStates.RUNNING);
+        // setRunStartedAt(Date.now()); // TODO: set runStartedAt to the time when the user start pressing the start button
+        setRunningResults(defaultRunningResults);
         setRunProcessingPopupVisible(true);
 
         // storageRunState will be set to runStates.RUNNING in storageCreateRun()
@@ -201,6 +224,7 @@ export default function RunScreen() {
     const stopRunProcessing = async () => {
         setRunState(runStates.NOT_STARTED);
         setRunStartedAt(0);
+        setRunningResults(defaultRunningResults);
         setStartCountdownSeconds(startRunBtnPressSeconds);
         setIsStartBtnPressed(false);
 

@@ -21,6 +21,7 @@ export const RunDataProvider = ({ children }: any) => {
     `runs_count` - number of runs
     `run_state` - see runStates in app-constants.ts
     `run_coordinates_{runNumber}` - array of coordinates of a run
+    `voice_notification_settings` - voice notifications default settings
     `voice_notification_info` - info about voice notification
 
     RUNS SCHEMA EXAMPLE:
@@ -94,11 +95,19 @@ export const RunDataProvider = ({ children }: any) => {
       }
     ]
 
-    VOICE_NOTIFICATION_INFO SCHEMA EXAMPLE:
+    VOICE_NOTIFICATION_SETTINGS SCHEMA EXAMPLE:
     {
         "enabled": true,
         "by": "distance",
+        "each_distance": 1000,
+        "each_time": 600
+    }
+
+    VOICE_NOTIFICATION_INFO SCHEMA EXAMPLE:
+    {
         "notified": false,
+        "enabled": true,
+        "by": "distance",
         "next_distance": 1000,
         "next_time": 600
     }
@@ -496,18 +505,21 @@ export const RunDataProvider = ({ children }: any) => {
                 return false;
             }
 
+            const voiceNotificationSettingsJson = await AsyncStorage.getItem('voice_notification_settings');
+            const voiceNotificationSettings = JSON.parse!(voiceNotificationSettingsJson);
+
             let needToNotify = false;
             if (distance >= parseInt(existingInfo.next_distance)) {
-                if (voiceNotification.by === 'distance' && !existingInfo.notified) {
+                if (voiceNotificationSettings.by === 'distance' && !existingInfo.notified) {
                     needToNotify = true;
                 }
-                existingInfo.next_distance = parseInt(existingInfo.next_distance) + voiceNotification.each_distance;
+                existingInfo.next_distance = parseInt(existingInfo.next_distance) + parseInt(voiceNotificationSettings.each_distance);
             }
             if (duration >= parseInt(existingInfo.next_time)) {
-                if (voiceNotification.by === 'time' && !existingInfo.notified) {
+                if (voiceNotificationSettings.by === 'time' && !existingInfo.notified) {
                     needToNotify = true;
                 }
-                existingInfo.next_time = parseInt(existingInfo.next_time) + voiceNotification.each_time;
+                existingInfo.next_time = parseInt(existingInfo.next_time) + parseInt(voiceNotificationSettings.each_time);
             }
 
             existingInfo.notified = needToNotify;
@@ -516,12 +528,27 @@ export const RunDataProvider = ({ children }: any) => {
 
             return needToNotify;
         } else {
+            // get voice notification settings
+            let voiceNotificationSettings;
+            const voiceNotificationSettingsJson = await AsyncStorage.getItem('voice_notification_settings');
+            if (voiceNotificationSettingsJson) {
+                voiceNotificationSettings = JSON.parse(voiceNotificationSettingsJson);
+            } else {
+                voiceNotificationSettings = {
+                    enabled: voiceNotification.enabled,
+                    by: voiceNotification.by,
+                    each_distance: voiceNotification.each_distance,
+                    each_time: voiceNotification.each_time,
+                };
+                await AsyncStorage.setItem('voice_notification_settings', JSON.stringify(voiceNotification));
+            }
+
             existingInfo = {
-                enabled: voiceNotification.enabled, // true or false
-                by: voiceNotification.by, // 'distance' or 'time'
                 notified: false,
-                next_distance: voiceNotification.each_distance, // meters
-                next_time: voiceNotification.each_time, // seconds
+                enabled: voiceNotificationSettings.enabled,
+                by: voiceNotificationSettings.by,
+                next_distance: voiceNotificationSettings.each_distance,
+                next_time: voiceNotificationSettings.each_time,
             };
             await AsyncStorage.setItem('voice_notification_info', JSON.stringify(existingInfo));
 
@@ -529,9 +556,60 @@ export const RunDataProvider = ({ children }: any) => {
         }
     }
 
+    const storageGetVoiceNotificationSettings = async (): Promise<{
+        enabled: boolean,
+        by: string,
+        each_distance: number,
+        each_time: number,
+    }> => {
+        let voiceNotificationSettings;
+        const voiceNotificationSettingsJson = await AsyncStorage.getItem('voice_notification_settings');
+        if (voiceNotificationSettingsJson) {
+            voiceNotificationSettings = JSON.parse(voiceNotificationSettingsJson);
+        } else {
+            voiceNotificationSettings = {
+                enabled: voiceNotification.enabled,
+                by: voiceNotification.by,
+                each_distance: voiceNotification.each_distance,
+                each_time: voiceNotification.each_time,
+            };
+            await AsyncStorage.setItem('voice_notification_settings', JSON.stringify(voiceNotificationSettings));
+        }
+
+        return voiceNotificationSettings;
+    }
+
+    const storageSetVoiceNotificationSettings = async (settings: {
+        enabled: boolean,
+        by: string,
+        each_distance: number,
+        each_time: number,
+    }) => {
+        let voiceNotificationSettings;
+        const voiceNotificationSettingsJson = await AsyncStorage.getItem('voice_notification_settings');
+        if (voiceNotificationSettingsJson) {
+            voiceNotificationSettings = JSON.parse(voiceNotificationSettingsJson);
+        } else {
+            voiceNotificationSettings = {
+                enabled: voiceNotification.enabled,
+                by: voiceNotification.by,
+                each_distance: voiceNotification.each_distance,
+                each_time: voiceNotification.each_time,
+            };
+        }
+
+        voiceNotificationSettings.enabled = settings.enabled;
+        voiceNotificationSettings.by = settings.by;
+        voiceNotificationSettings.each_distance = settings.each_distance;
+        voiceNotificationSettings.each_time = settings.each_time;
+
+        await AsyncStorage.setItem('voice_notification_settings', JSON.stringify(voiceNotificationSettings));
+    }
 
 
-    // check if there is internet connection, if yes, send all runs and its coordinates to server flush them from local storage
+
+    // Check if there is an internet connection.
+    // If yes, send all runs and its coordinates to server flush them from local storage
     const sendAllRunsDataToServer = async () => {
         NetInfo.fetch().then(async (state) => {
             if (!state.isConnected) {
@@ -612,6 +690,8 @@ export const RunDataProvider = ({ children }: any) => {
             storageDeleteRun,
             storageGetAllRunsData,
             storageVoiceNotificationInfo,
+            storageGetVoiceNotificationSettings,
+            storageSetVoiceNotificationSettings,
             sendAllRunsDataToServer,
         }}>
             {children}

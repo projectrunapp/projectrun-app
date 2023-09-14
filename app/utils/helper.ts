@@ -63,13 +63,17 @@ export function humanizedDistance(distanceInMeters: number): string {
     if (distanceInMeters < 1000) {
         return `${distanceInMeters} m`;
     } else {
-        return `${(distanceInMeters / 1000).toFixed(1)} km`;
+        return `${(distanceInMeters / 1000).toFixed(2)} km`;
     }
 }
 export function humanizedDistancePartials(distanceInMeters: number) {
+    const m = Math.round(distanceInMeters % 1000);
+    const hundreds = Math.floor(m / 100);
+
     return {
         km: Math.floor(distanceInMeters / 1000),
-        m: Math.round(distanceInMeters % 1000),
+        hundreds: Math.floor(m / 100),
+        ddm: m - hundreds * 100,
     };
 }
 export function humanizedDuration(durationInSeconds: number): string {
@@ -97,5 +101,5 @@ export function humanizedDurationPartials(durationInSeconds: number) {
     };
 }
 export function humanizedAvgSpeed(avgSpeedMetersPerSeconds: number): string {
-    return `${(avgSpeedMetersPerSeconds * 3.6).toFixed(1)} km/h`;
+    return `${(avgSpeedMetersPerSeconds * 3.6).toFixed(2)} km/h`;
 }

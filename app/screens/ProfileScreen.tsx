@@ -24,6 +24,7 @@ import axios from "axios";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {dateFormat} from "../utils/helper";
 import ProfileImage from "../components/ProfileImage";
+import VoiceNotificationSettings from "../components/VoiceNotificationSettings";
 
 export default function ProfileScreen() {
     const { authState, getStorageUser, setStorageUser } = useAuth();
@@ -59,6 +60,31 @@ export default function ProfileScreen() {
         setBirthDate(dateFormat(currentDate));
     }
 
+    const getMe = async () => {
+        try {
+            const response = await axios.get(`${process.env.API_URL}/users/me`, {
+                headers: {
+                    Authorization: `Bearer ${authState!.token}`,
+                    // "Content-Type": "application/json",
+                }
+            });
+
+            await setStorageUser!({
+                id: response.data.id,
+                name: response.data.name,
+                email: response.data.email,
+                username: response.data.username,
+                birth_date: response.data.birth_date,
+                gender: response.data.gender,
+                avatar: response.data.avatar,
+            });
+
+            return response.data;
+        } catch (err) {
+            // console.error(err.message);
+            return {success: false, message: "Something went wrong!"};
+        }
+    }
     const updateProfile = async () => {
         try {
             const response = await axios.put(`${process.env.API_URL}/users/profile`, {
@@ -96,7 +122,15 @@ export default function ProfileScreen() {
         showPopup(result.success, result.message);
     }
     const getProfile = async () => {
-        const storageUser = await getStorageUser!();
+        let storageUser = await getStorageUser!();
+        if (!storageUser.email) {
+            const response = await getMe(); // storageUser will be updated in getMe()
+            if (!response.success) {
+                return;
+            }
+
+            storageUser = response.data;
+        }
 
         setEmail(storageUser.email);
         setUsername(storageUser.username);
@@ -197,6 +231,8 @@ export default function ProfileScreen() {
                     </Pressable>
 
                 </View>
+
+                <VoiceNotificationSettings showPopup={showPopup} />
 
                 <View style={styles.logout_btn_container}>
                     <Pressable onPress={logoutPrompt} style={styles.logout_btn}>
