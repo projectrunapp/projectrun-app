@@ -15,26 +15,31 @@ export const popupOptions = {
     error_color: '#E25E3E',
 };
 
-export const updateLocationTimeoutSeconds = 10; // 10-30
+export const updateLocationTimeoutSeconds = 5; // 3-20
 export const startRunBtnPressSeconds = 3;
 export const stopRunBtnPressSeconds = 3;
 export const guaranteeSecondsAfterStartBtnPress = 3;
 export const runStates = {NOT_STARTED: 0, RUNNING: 1, PAUSED: 2, FINISHED: 3};
 export const runStateTitles = {0: "Not Started", 1: "Running", 2: "Paused", 3: "Finished"};
 
+// TODO: change to default values for production
 export const voiceNotification = {
     enabled: true, // true (default) | false
+
     by: 'time', // distance (default) | time
+
+    each_distance: 100,
     distance_options: [
         {label: '100 m', value: '100'},
         {label: '0.5 km', value: '500'},
-        {label: '1 km', value: '1000'},
+        {label: '1 km', value: '1000'}, // default
     ],
-    each_distance: 1000, // meters - 100 | 500 | 1000 (default)
+
+    each_time: 60,
     time_options: [
-        {label: '10 min', value: '600'},
+        {label: '1 min', value: '60'},
+        {label: '10 min', value: '600'}, // default
         {label: '30 min', value: '1800'},
         {label: '1 hr', value: '3600'}
     ],
-    each_time: 60, // seconds - 60 | 600 (default) | 1800 | 3600
 };
