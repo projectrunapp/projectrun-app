@@ -19,7 +19,13 @@ const RunsDataTable = () => {
 
     const navigateToSingleRun = (runId: number, title: string) => {
         // @ts-ignore
-        navigation.navigate("Run", { screen: "SingleRunScreen", params: { runId, title } });
+        navigation.navigate("Run", {
+            screen: "SingleRunScreen",
+            params: {
+                runId,
+                title,
+            }
+        });
     };
 
     const loadRuns = async () => {

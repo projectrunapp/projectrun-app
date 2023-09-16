@@ -133,11 +133,11 @@ export const RunDataProvider = ({ children }: any) => {
         data?: {
             title: string,
         },
-    }> => {
+    }> =>
+    {
         const storageRunState = await storageGetRunState();
         if (storageRunState === runStates.RUNNING || storageRunState === runStates.PAUSED) {
-            // console.info("Storage run state is already running or paused!");
-            return;
+            return {success: false, message: "Storage run state is already running or paused!"};
         } else {
             await storageSetRunState(runStates.RUNNING);
         }
@@ -195,7 +195,8 @@ export const RunDataProvider = ({ children }: any) => {
             duration: number,
             avg_speed: number,
         },
-    }> => {
+    }> =>
+    {
         const storageRunState = await storageGetRunState();
         if (storageRunState !== runStates.RUNNING && storageRunState !== runStates.PAUSED) {
             return {
@@ -351,7 +352,8 @@ export const RunDataProvider = ({ children }: any) => {
             duration: number,
             avg_speed: number,
         }
-    }> => {
+    }> =>
+    {
         // get the last received distance, duration, avg_speed by the last coordinate
         const storageRunState = await storageGetRunState();
         if (storageRunState !== runStates.RUNNING && storageRunState !== runStates.PAUSED) {
@@ -561,7 +563,8 @@ export const RunDataProvider = ({ children }: any) => {
         by: string,
         each_distance: number,
         each_time: number,
-    }> => {
+    }> =>
+    {
         let voiceNotificationSettings;
         const voiceNotificationSettingsJson = await AsyncStorage.getItem('voice_notification_settings');
         if (voiceNotificationSettingsJson) {
@@ -584,7 +587,8 @@ export const RunDataProvider = ({ children }: any) => {
         by: string,
         each_distance: number,
         each_time: number,
-    }) => {
+    }) =>
+    {
         let voiceNotificationSettings;
         const voiceNotificationSettingsJson = await AsyncStorage.getItem('voice_notification_settings');
         if (voiceNotificationSettingsJson) {
@@ -676,6 +680,7 @@ export const RunDataProvider = ({ children }: any) => {
 
 
 
+    // TODO: remove all the commented methods which are not needed
     return (
         <RunDataContext.Provider value={{
             storageGetRunState,
@@ -683,11 +688,11 @@ export const RunDataProvider = ({ children }: any) => {
             storageCreateRun,
             storageAddRunCoordinate,
             storageStopRun,
-            storageGetRuns,
+            // storageGetRuns,
             storageGetRun,
             storageGetRunCoordinates,
-            storageUpdateRun,
-            storageDeleteRun,
+            // storageUpdateRun,
+            // storageDeleteRun,
             storageGetAllRunsData,
             storageVoiceNotificationInfo,
             storageGetVoiceNotificationSettings,

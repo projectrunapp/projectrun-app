@@ -50,7 +50,11 @@ npm install -g eas-cli
 - [Build APKs for Android Emulators and devices](https://docs.expo.dev/build-reference/apk/)
 
 ```bash
+# build for android using Expo servers
 eas build -p android --profile preview
+
+# build for android using local machine
+eas build -p android --profile preview --local
 ```
 
 - Optional:
