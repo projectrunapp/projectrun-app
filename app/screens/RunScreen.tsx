@@ -1,26 +1,27 @@
 
-import { Audio } from 'expo-av';
 import {SafeAreaView} from 'react-native';
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import PopupMessage from "../components/PopupMessage";
 import RunControls from "../components/RunControls";
 import RunStartingLocation from "../components/RunStartingLocation";
 import RunProcessingPopup from "../components/RunProcessingPopup";
-import {runStates, startRunBtnPressSeconds} from "../utils/app-constants";
+import {runStates, startRunBtnPressSeconds, trackingTask, updateLocationTimeoutSeconds} from "../utils/app-constants";
 import {useRunData} from "../context/RunDataContext";
 import {useNavigation} from "@react-navigation/native";
-import {humanizedDistancePartials, humanizedDurationPartials} from "../utils/helper";
-import audioFiles from "../utils/AudioFiles";
+import * as Location from "expo-location";
+import {collectVoices} from "../utils/helper";
+import {useTaskManager} from "../hooks/TaskManager";
+import {useSoundPlayer} from "../hooks/SoundPlayer";
+
+let foregroundSubscription = null;
+let foregroundResultingSubscription = null;
+let foregroundResultingSubscriptionInterval = null;
 
 export default function RunScreen() {
-    const {
-        storageCreateRun,
-        storageStopRun,
-        sendAllRunsDataToServer,
-        storageGetRunState,
-        storageAddRunCoordinate,
-        storageVoiceNotificationInfo,
-    } = useRunData();
+
+    const { startTask } = useTaskManager();
+    const { playSequentialSounds } = useSoundPlayer();
+    const {storageCreateRun, storageGetRun, storageStopRun, sendAllRunsDataToServer} = useRunData();
     const navigation = useNavigation();
 
     const [isPopupVisible, setPopupVisible] = useState<boolean>(false);
@@ -34,6 +35,9 @@ export default function RunScreen() {
     const closePopup = () => {
         setPopupVisible(false); // setPopupMessage(""); setPopupSuccess(true);
     }
+
+    const [retrievingMapLocation, setRetrievingMapLocation] = useState<boolean>(true);
+    const [currentMapLocation, setCurrentMapLocation] = useState<any>(null);
 
     const [stopRunLoading, setStopRunLoading] = useState<boolean>(false);
     const [runState, setRunState] = useState<number>(runStates.NOT_STARTED);
@@ -53,137 +57,6 @@ export default function RunScreen() {
         duration: number,
         avg_speed: number
     }>(defaultRunningResults);
-    const [sound, setSound] = useState();
-    const playSound = async (fileName: string) => {
-        if (audioFiles[fileName]) {
-            const requireAudioFile = audioFiles[fileName].file;
-            const { sound: currentSound } = await Audio.Sound.createAsync(requireAudioFile);
-            setSound!(currentSound);
-
-            await currentSound.playAsync();
-        }
-    }
-    const sleep = async (ms) => {
-        return new Promise((r) => setTimeout(r, ms));
-    }
-    const playSequentialSounds = async (fileNames: string[]) => {
-        for (let i = 0; i < fileNames.length; i++) {
-            await playSound(fileNames[i]);
-            await sleep(audioFiles[fileNames[i]].duration * 1000);
-        }
-    }
-    useEffect(() => {
-        if (sound) {
-            return () => {
-                sound.unloadAsync();
-            };
-        }
-    }, [sound]);
-
-    const collectVoices = (
-        result: { distance: number, duration: number, avg_speed: number},
-        voices: string[] = []
-    ): string[] => {
-        const silenceAudio = "silence-1";
-        voices.push(silenceAudio);
-
-        // distance
-        const distancePartials = humanizedDistancePartials(result.distance);
-        voices.push("distance");
-        if (distancePartials.km === 0 && distancePartials.hundreds === 0 && distancePartials.ddm === 0) {
-            voices.push("0");
-        }
-        if (distancePartials.km > 0) {
-            voices.push(distancePartials.km.toString());
-            if (distancePartials.km === 1) {
-                voices.push("kilometer");
-            } else {
-                voices.push("kilometers");
-            }
-        }
-        if (distancePartials.hundreds > 0) {
-            voices.push(distancePartials.hundreds.toString());
-            voices.push("hundred");
-        }
-        if (distancePartials.ddm > 0) {
-            voices.push(distancePartials.ddm.toString());
-        }
-        voices.push("meters");
-
-        if (voices[voices.length - 1] !== silenceAudio) {voices.push(silenceAudio);}
-
-        // duration
-        const durationPartials = humanizedDurationPartials(result.duration);
-        voices.push("time");
-        if (durationPartials.h === 0 && durationPartials.m === 0 && durationPartials.s === 0) {
-            voices.push("0");
-            voices.push("seconds");
-        }
-        if (durationPartials.h > 0) {
-            voices.push(durationPartials.h.toString());
-            if (durationPartials.h === 1) {
-                voices.push("hour");
-            } else {
-                voices.push("hours");
-            }
-        }
-        if (durationPartials.m > 0) {
-            voices.push(durationPartials.m.toString());
-            if (durationPartials.m === 1) {
-                voices.push("minute");
-            } else {
-                voices.push("minutes");
-            }
-        }
-        if (durationPartials.s > 0) {
-            voices.push(durationPartials.s.toString());
-            if (durationPartials.s === 1) {
-                voices.push("second");
-            } else {
-                voices.push("seconds");
-            }
-        }
-
-        if (voices[voices.length - 1] !== silenceAudio) {voices.push(silenceAudio);}
-
-        // avg_speed
-        if (result.avg_speed > 0) {
-            voices.push("average-speed");
-
-            // TODO: remove this block (just another implementation of the same logic)
-            // if (result.avg_speed % 1 !== 0) { // if result.avg_speed is float
-            //     const avgSpeedPartials = result.avg_speed.toString().split('.');
-            //
-            //     const avgSpeedPartialsBeforeDot = avgSpeedPartials[0];
-            //     voices.push(avgSpeedPartialsBeforeDot.toString());
-            //
-            //     voices.push("point");
-            //
-            //     // two digits after the dot will be rounded
-            //     const avgSpeedPartialsAfterDot = avgSpeedPartials[1].slice(0, 3);
-            //     const roundedAfterDot = Math.round(parseInt(avgSpeedPartialsAfterDot) / 10);
-            //
-            //     voices.push(roundedAfterDot.toString());
-            // } else {
-            //     voices.push(result.avg_speed.toString());
-            // }
-
-            const avgSpeed = Math.round(result.avg_speed * 100) / 100;
-            const avgSpeedPartials = avgSpeed.toString().split('.');
-            const avgSpeedPartialsBeforeDot = avgSpeedPartials[0];
-            voices.push(avgSpeedPartialsBeforeDot.toString());
-            if (avgSpeedPartials.length > 1 && avgSpeedPartials[1] !== "00") {
-                voices.push("point");
-                voices.push(avgSpeedPartials[1].toString());
-            }
-
-            voices.push("kilometers-per-hour");
-        }
-
-        if (voices[voices.length - 1] !== silenceAudio) {voices.push(silenceAudio);}
-
-        return voices;
-    };
 
     const startRunProcessing = async () => {
         setRunState(runStates.RUNNING);
@@ -195,38 +68,25 @@ export default function RunScreen() {
         const startedRunResults = await storageCreateRun();
         if (startedRunResults.success) {
             setRunTitle(startedRunResults.data.title);
-        }
 
-        playSequentialSounds([
-            "start",
-        ]);
-    }
+            startBackgroundTracking();
 
-    const addRunCoordinate = async (lat: number, lng: number) => {
-        const storageRunState = await storageGetRunState();
-        if (storageRunState === runStates.RUNNING || storageRunState === runStates.PAUSED) {
-            const result = await storageAddRunCoordinate(lat, lng, storageRunState);
-            if (result.success) {
-                setRunningResults(result.data);
-
-                const needToNotify = await storageVoiceNotificationInfo(result.data.distance, result.data.duration);
-                if (needToNotify) {
-                    const voices = collectVoices(result.data, []);
-                    playSequentialSounds(voices);
-                }
-            }
+            playSequentialSounds([
+                "start",
+            ]);
+        } else {
+            showPopup(false, startedRunResults.message);
         }
     }
-
-    // const closeRunProcessingPopup = () => {
-    //     setRunProcessingPopupVisible(false);
-    // }
     const stopRunProcessing = async () => {
         setRunState(runStates.NOT_STARTED);
         setRunStartedAt(0);
         setRunningResults(defaultRunningResults);
         setStartCountdownSeconds(startRunBtnPressSeconds);
         setIsStartBtnPressed(false);
+
+        await stopForegroundResulting();
+        await stopBackgroundTracking();
 
         setStopRunLoading(true);
         // storageRunState will be set to runStates.NOT_STARTED in storageStopRun()
@@ -246,14 +106,106 @@ export default function RunScreen() {
         setRunProcessingPopupVisible(false);
 
         // @ts-ignore
-        navigation.navigate("Run", { screen: "SingleRunScreen", params: {
-            runId: null,
-            title: "Morning Run!",
-            popup: {
-                success: true,
-                message: "Run stopped successfully.",
-            },
-        }});
+        navigation.navigate("Run", {
+            screen: "SingleRunScreen",
+            params: {
+                runId: null,
+                title: "Morning Run!",
+                popup: {
+                    success: true,
+                    message: "Run stopped successfully.",
+                },
+            }
+        });
+    }
+
+    const startForegroundTracking = async () => {
+        setRetrievingMapLocation(false);
+
+        // Check if foreground permission is granted
+        const foregroundPermissions = await Location.requestForegroundPermissionsAsync();
+        if (foregroundPermissions.status === 'granted') {
+            setPermissionAllowed(true);
+
+            // Make sure that foreground location tracking is not running
+            await stopForegroundTracking();
+
+            // Start watching position in real-time
+            foregroundSubscription = await Location.watchPositionAsync({
+                timeInterval: updateLocationTimeoutSeconds * 1000,
+                accuracy: Location.Accuracy.BestForNavigation,
+            }, location => { // Location in foreground
+                setCurrentMapLocation({
+                    lat: location.coords.latitude,
+                    lng: location.coords.longitude,
+                });
+
+                const currentTime = new Date().toLocaleTimeString("en-US", {hour12: false});
+                console.info(`FOREGROUND: ${currentTime} >>> ${location.coords.latitude}, ${location.coords.longitude}`);
+            });
+        } else { // Foreground location tracking denied!
+            setPermissionAllowed(false);
+            showPopup(false, "Access denied to track location in foreground!");
+        }
+    }
+    const startForegroundResulting = async () => {
+        // foreground permissions here are already granted
+
+        // make sure that foreground resulting is not running
+        await stopForegroundResulting();
+
+        foregroundResultingSubscriptionInterval = setInterval(async () => {
+            const storageRun = await storageGetRun();
+            if (storageRun) {
+                setRunningResults(storageRun);
+            }
+        }, updateLocationTimeoutSeconds * 1000);
+    }
+    const stopForegroundTracking = async () => {
+        if (foregroundSubscription) {
+            await foregroundSubscription.remove();
+        }
+    }
+    const stopForegroundResulting = async () => {
+        if (foregroundResultingSubscription) {
+            await foregroundResultingSubscription.remove();
+        }
+        if (foregroundResultingSubscriptionInterval) {
+            clearInterval(foregroundResultingSubscriptionInterval);
+            foregroundResultingSubscriptionInterval = null;
+        }
+    }
+    const tryStartRunProcessing = async () => {
+        const foregroundPermissions = await Location.requestForegroundPermissionsAsync();
+        if (foregroundPermissions.status !== 'granted') {showPopup(false, "Foreground location tracking denied!"); return;}
+
+        // Don't track position if permission is not granted
+        const backgroundPermissions = await Location.requestBackgroundPermissionsAsync();
+        if (backgroundPermissions.status !== 'granted') {showPopup(false, "Background location tracking denied!"); return;}
+
+        await stopForegroundTracking();
+        await startForegroundResulting();
+
+        setRunStartedAt(Date.now());
+
+        // Start run processing
+        startRunProcessing();
+    }
+    const startBackgroundTracking = async () => {
+        // Here background location tracking is allowed
+
+        await startTask();
+
+        showPopup(true, "Location tracking started!");
+    }
+    const stopBackgroundTracking = async (): Promise<{success: boolean, message: string}> => {
+        const hasStarted = await Location.hasStartedLocationUpdatesAsync(trackingTask.name);
+        if (hasStarted) {
+            await Location.stopLocationUpdatesAsync(trackingTask.name);
+            return {success: true, message: "Background location tracking stopped!"};
+        } else {
+            return {success: false, message: "Background location tracking is not running!"};
+        }
     }
 
     return (
@@ -274,16 +226,15 @@ export default function RunScreen() {
                                 runningResults={runningResults}
                                 runTitle={runTitle}
             />
-            <RunStartingLocation showPopup={showPopup}
+            <RunStartingLocation retrievingMapLocation={retrievingMapLocation}
                                  permissionAllowed={permissionAllowed}
-                                 setPermissionAllowed={setPermissionAllowed}
-                                 addRunCoordinate={addRunCoordinate}
+                                 currentMapLocation={currentMapLocation}
+                                 startForegroundTracking={startForegroundTracking}
+                                 stopForegroundTracking={stopForegroundTracking}
             />
-            <RunControls showPopup={showPopup}
-                         permissionAllowed={permissionAllowed}
-                         startRunProcessing={startRunProcessing}
+            <RunControls permissionAllowed={permissionAllowed}
+                         tryStartRunProcessing={tryStartRunProcessing}
                          runState={runState}
-                         setRunStartedAt={setRunStartedAt}
                          startCountdownSeconds={startCountdownSeconds}
                          setStartCountdownSeconds={setStartCountdownSeconds}
                          isStartBtnPressed={isStartBtnPressed}

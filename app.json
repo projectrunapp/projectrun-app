@@ -15,12 +15,25 @@
       "**/*"
     ],
     "ios": {
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location",
+          "fetch",
+          "audio"
+        ]
+      },
       "config": {
         "usesNonExemptEncryption": false
       },
       "supportsTablet": true
     },
     "android": {
+      "permissions": [
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "FOREGROUND_SERVICE"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/app-adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -39,7 +52,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(APP_NAME) to access your location",
+          "locationAlwaysAndWhenInUsePermission": "Allow $(APP_NAME) to access your location"
         }
       ],
       [

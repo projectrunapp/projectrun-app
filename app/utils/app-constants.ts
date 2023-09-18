@@ -43,3 +43,10 @@ export const voiceNotification = {
         {label: '1 hr', value: '3600'}
     ],
 };
+
+export const trackingTask = {
+    name: 'location_tracking',
+    title: "Location Tracking",
+    body: "Location tracking in background",
+    color: "#fff",
+};

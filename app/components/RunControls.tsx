@@ -4,15 +4,13 @@ import {runStateTitles, runStates, startRunBtnPressSeconds} from "../utils/app-c
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 export default function RunControls({
-                                        showPopup,
                                         permissionAllowed,
-                                        startRunProcessing,
+                                        tryStartRunProcessing,
                                         runState,
-                                        setRunStartedAt,
                                         startCountdownSeconds,
                                         setStartCountdownSeconds,
                                         isStartBtnPressed,
-                                        setIsStartBtnPressed
+                                        setIsStartBtnPressed,
 }) {
     const handleStartBtnPressIn = () => {
         setIsStartBtnPressed(true);
@@ -21,16 +19,14 @@ export default function RunControls({
         this.intervalForStart = setInterval(() => {
             // TODO: don't divide by 1000
             if (Math.floor((Date.now() - this.startBtnPressedInTime) / 1000) >= startRunBtnPressSeconds) {
-                // showPopup(true, "Run started.");
-                setStartCountdownSeconds(startRunBtnPressSeconds);
-
+                // console.info("Run started.");
                 clearInterval(this.intervalForStart);
                 this.startBtnPressedInTime = 0;
                 setIsStartBtnPressed(false);
 
-                setRunStartedAt(Date.now());
+                setStartCountdownSeconds(startRunBtnPressSeconds);
 
-                startRunProcessing();
+                tryStartRunProcessing();
             } else {
                 // console.info("Start button pressed time: ", Math.floor((Date.now() - this.startBtnPressedInTime) / 1000));
                 setStartCountdownSeconds(prevState => prevState - 1);
@@ -38,7 +34,7 @@ export default function RunControls({
         }, 1000);
     };
     const handleStartBtnPressOut = () => {
-        showPopup(false, "Run wasn't started!");
+        // console.info("Run wasn't started!");
         setStartCountdownSeconds(startRunBtnPressSeconds);
 
         clearInterval(this.intervalForStart);

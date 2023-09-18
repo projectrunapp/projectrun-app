@@ -1,81 +1,48 @@
 
-import * as Location from "expo-location";
 import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {ActivityIndicator, Button, StyleSheet, Text, View} from "react-native";
-import {appPrimaryColor, updateLocationTimeoutSeconds} from "../utils/app-constants";
+import {appPrimaryColor} from "../utils/app-constants";
 import {useIsFocused} from "@react-navigation/native";
 
 export default function RunStartingLocation({
-                                                showPopup,
+                                                retrievingMapLocation,
                                                 permissionAllowed,
-                                                setPermissionAllowed,
-                                                addRunCoordinate,
+                                                currentMapLocation,
+                                                startForegroundTracking,
+                                                stopForegroundTracking,
 }) {
     const isFocused = useIsFocused();
-    const [retrievingLocation, setRetrievingLocation] = useState<boolean>(true);
-    const [currentLocation, setCurrentLocation] = useState<any>(null);
-
-    const updateLocation = async () => {
-        const permissionRequest = await Location.requestForegroundPermissionsAsync();
-        // {"android": {"accuracy": "fine", "scoped": "fine"}, "canAskAgain": true, "expires": "never", "granted": true, "status": "granted"}
-        if (permissionRequest.status === "granted") {
-            setPermissionAllowed(true);
-            const location = await Location.getCurrentPositionAsync({});
-
-            setRetrievingLocation(false);
-            setCurrentLocation({
-                lat: location.coords.latitude,
-                lng: location.coords.longitude,
-            });
-
-            // calling the async method without await
-            addRunCoordinate(location.coords.latitude, location.coords.longitude);
-
-            const currentTime = new Date().toLocaleTimeString("en-US", {hour12: false});
-            console.info(`LOCATION: ${currentTime} >>> ${location.coords.latitude}, ${location.coords.longitude}`);
-        } else {
-            setRetrievingLocation(false);
-            setPermissionAllowed(false);
-            showPopup(false, "Access denied!");
-        }
-    };
 
     useEffect(() => {
-        let intervalId = null;
-
         if (isFocused && permissionAllowed) { // the component mounts or the screen gains focus
-            intervalId = setInterval(() => {
-                updateLocation();
-            }, updateLocationTimeoutSeconds * 1000);
+            startForegroundTracking();
         } else { // the screen loses focus
-            clearInterval(intervalId);
+            stopForegroundTracking();
         }
-
-        return () => clearInterval(intervalId); // the component unmounts or the screen loses focus
     }, [isFocused, permissionAllowed]);
 
     useEffect(() => {
         if (isFocused) {
-            updateLocation();
+            startForegroundTracking();
         }
     }, []);
 
-    return retrievingLocation ? (
+    return retrievingMapLocation ? (
         <View style={styles.loading_container}>
             <ActivityIndicator size="large" />
         </View>
     ) : (permissionAllowed ? (
-        currentLocation ? (
+        currentMapLocation ? (
             <MapView provider={PROVIDER_GOOGLE} style={styles.map} initialRegion={{
-                latitude: currentLocation.lat,
-                longitude: currentLocation.lng,
+                latitude: currentMapLocation.lat,
+                longitude: currentMapLocation.lng,
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
             }}>
                 <Marker description="Starting location" pinColor={appPrimaryColor} coordinate={{
-                    latitude: currentLocation.lat,
-                    longitude: currentLocation.lng,
+                    latitude: currentMapLocation.lat,
+                    longitude: currentMapLocation.lng,
                 }}/>
             </MapView>
         ) : (
@@ -87,7 +54,7 @@ export default function RunStartingLocation({
         )
     ) : (
         <View style={styles.allow_access_container}>
-            <Button title="Allow access" onPress={() => updateLocation()}/>
+            <Button title="Allow access" onPress={() => startForegroundTracking()}/>
         </View>
     ))
 }
