@@ -1,6 +1,6 @@
 
 import {SafeAreaView} from 'react-native';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import PopupMessage from "../components/PopupMessage";
 import RunControls from "../components/RunControls";
 import RunStartingLocation from "../components/RunStartingLocation";
@@ -11,7 +11,8 @@ import {useNavigation} from "@react-navigation/native";
 import * as Location from "expo-location";
 import {collectVoices} from "../utils/helper";
 import {useTaskManager} from "../hooks/TaskManager";
-import {useSoundPlayer} from "../hooks/SoundPlayer";
+import TrackPlayer, {Event, useTrackPlayerEvents} from "react-native-track-player";
+import audioFiles from "../utils/AudioFiles";
 
 let foregroundSubscription = null;
 let foregroundResultingSubscription = null;
@@ -20,7 +21,6 @@ let foregroundResultingSubscriptionInterval = null;
 export default function RunScreen() {
 
     const { startTask } = useTaskManager();
-    const { playSequentialSounds } = useSoundPlayer();
     const {storageCreateRun, storageGetRun, storageStopRun, sendAllRunsDataToServer} = useRunData();
     const navigation = useNavigation();
 
@@ -57,6 +57,51 @@ export default function RunScreen() {
         duration: number,
         avg_speed: number
     }>(defaultRunningResults);
+
+
+
+    const initPlayer = async () => {
+        try {
+            await TrackPlayer.setupPlayer();
+            // await TrackPlayer.updateOptions({
+            //     capabilities: [Capability.Play, Capability.SkipToNext],
+            // });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const getTrackData = async () => {
+        const trackIndex = await TrackPlayer.getCurrentTrack();
+        const track = await TrackPlayer.getTrack!(trackIndex);
+    };
+    const playSequentialSounds = async (voices: string[]) => {
+        const tracks = voices.map(voice => {
+            return {
+                url: audioFiles[voice].file,
+                title: voice,
+                artist: voice,
+                artwork: "https://avatars.githubusercontent.com/u/22226570",
+            };
+        });
+
+        try {
+            await TrackPlayer.add(tracks);
+            await getTrackData();
+            await TrackPlayer.play();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    useTrackPlayerEvents([Event.PlaybackTrackChanged, Event.PlaybackQueueEnded], async event => {
+        if (event.type === Event.PlaybackQueueEnded && event.nextTrack == undefined) {
+            await TrackPlayer.reset();
+        }
+        if (event.type === Event.PlaybackTrackChanged && event.nextTrack != undefined) {
+            const track = await TrackPlayer.getTrack(event.nextTrack);
+        }
+    });
+
+
 
     const startRunProcessing = async () => {
         setRunState(runStates.RUNNING);
@@ -207,6 +252,10 @@ export default function RunScreen() {
             return {success: false, message: "Background location tracking is not running!"};
         }
     }
+
+    useEffect(() => {
+        initPlayer();
+    }, []);
 
     return (
         <SafeAreaView style={{flex: 1}}>
