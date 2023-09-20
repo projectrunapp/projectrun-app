@@ -2,7 +2,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from '@react-native-community/netinfo';
 import { createContext, useContext } from 'react';
-import {calculateDistanceInMeters, generateRunTitle} from "../utils/helper";
+import {calculateAvgSpeed, calculateDistanceInMeters, generateRunTitle} from "../utils/helper";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import {runStates, voiceNotification} from "../utils/app-constants";
@@ -46,8 +46,8 @@ export const RunDataProvider = ({ children }: any) => {
         "distance_pauses_included": 2500,
         "duration": 5000,
         "duration_pauses_included": 6000,
-        "avg_speed": 8.5,
-        "avg_speed_pauses_included": 7.5
+        "avg_speed": 140,
+        "avg_speed_pauses_included": 120
       },
       ...
     ]
@@ -89,9 +89,9 @@ export const RunDataProvider = ({ children }: any) => {
         "duration_piece": 10,
         "duration_total": 5000,
         "duration_total_pauses_included": 6000,
-        "avg_speed_piece": 7.9,
-        "avg_speed_total": 8.5,
-        "avg_speed_total_pauses_included": 7.5
+        "avg_speed_piece": 130,
+        "avg_speed_total": 145,
+        "avg_speed_total_pauses_included": 120
       }
     ]
 
@@ -288,16 +288,15 @@ export const RunDataProvider = ({ children }: any) => {
             runs[runIndex].timestamp_last_updated = unixTimeInSecond;
 
             // avg_speed_piece & avg_speed & avg_speed_pauses_included
-            // TODO: calculate in km/h
-            avgSpeedPiece = Math.round((distancePiece / durationPiece) * 100) / 100;
+            avgSpeedPiece = calculateAvgSpeed(distancePiece, durationPiece);
             if (isActive) {
-                avgSpeed = Math.round(parseInt(runs[runIndex].distance) / parseInt(runs[runIndex].duration) * 100) / 100;
+                avgSpeed = calculateAvgSpeed(parseInt(runs[runIndex].distance), parseInt(runs[runIndex].duration));
                 runs[runIndex].avg_speed = avgSpeed;
                 resultAvgSpeed = avgSpeed;
             } else {
-                resultAvgSpeed = Math.round(parseInt(runs[runIndex].distance) / parseInt(runs[runIndex].duration) * 100) / 100;
+                resultAvgSpeed = calculateAvgSpeed(parseInt(runs[runIndex].distance), parseInt(runs[runIndex].duration));
             }
-            avgSpeedPausesIncluded = Math.round(parseInt(runs[runIndex].duration_pauses_included) / parseInt(runs[runIndex].distance_pauses_included) * 100) / 100;
+            avgSpeedPausesIncluded = calculateAvgSpeed(parseInt(runs[runIndex].duration_pauses_included), parseInt(runs[runIndex].distance_pauses_included));
             runs[runIndex].avg_speed_pauses_included = avgSpeedPausesIncluded;
         }
 

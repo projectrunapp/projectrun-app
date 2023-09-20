@@ -110,6 +110,7 @@ export default {
     "kilometers-per-hour": {file: require('../../assets/audio/kilometers-per-hour.mp3'), duration: 1.512},
     "meter": {file: require('../../assets/audio/meter.mp3'), duration: 0.744},
     "meters": {file: require('../../assets/audio/meters.mp3'), duration: 0.840},
+    "meters-per-minute": {file: require('../../assets/audio/meters-per-minute.mp3'), duration: 1.272},
     "mile": {file: require('../../assets/audio/mile.mp3'), duration: 0.720},
     "miles": {file: require('../../assets/audio/miles.mp3'), duration: 0.816},
     "miles-per-hour": {file: require('../../assets/audio/miles-per-hour.mp3'), duration: 1.416},

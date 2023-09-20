@@ -1,5 +1,5 @@
 
-// Function to calculate distance between two coordinates using Haversine formula in meters
+// calculate distance between two coordinates using Haversine formula in meters
 export function calculateDistanceInMeters(lat1, lng1, lat2, lon2) {
     const R = 6371 * 1000; // Radius of the Earth in meters
     const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -15,21 +15,15 @@ export function calculateDistanceInMeters(lat1, lng1, lat2, lon2) {
 
 // generate run title based on current time of day
 export function generateRunTitle(hour?: number): string {
-    // check if "hour" is provided
     if (!hour) {
         hour = (new Date()).getHours();
     }
 
     let title = "Run!";
-    if (hour >= 5 && hour < 12) {
-        title = `Morning ${title}`;
-    } else if (hour >= 12 && hour < 18) {
-        title = `Afternoon ${title}`;
-    } else if (hour >= 18 && hour < 22) {
-        title = `Evening ${title}`;
-    } else {
-        title = `Night ${title}`;
-    }
+    if (hour >= 5 && hour < 12) {title = `Morning ${title}`;}
+    else if (hour >= 12 && hour < 18) {title = `Afternoon ${title}`;}
+    else if (hour >= 18 && hour < 22) {title = `Evening ${title}`;}
+    else {title = `Night ${title}`;}
 
     return title;
 }
@@ -38,16 +32,18 @@ export function generateRunTitle(hour?: number): string {
 export function dateStringFormat(dateString: number): string {
     const date = new Date(dateString);
 
-    const month = date.toLocaleString('default', { month: 'short' });
-    const day = date.getDate();
-    const year = date.getFullYear();
+    // const month = date.toLocaleString('default', { month: 'short' });
+    // const day = date.getDate();
+    // const year = date.getFullYear();
     const time = date.toLocaleString('default', {
         hour: 'numeric',
         minute: 'numeric',
-        hour12: true
-    })
+        second: 'numeric',
+        hour12: true,
+    });
 
-    return `${month} ${day}, ${year}; ${time}`;
+    // return `${month} ${day}, ${year}; ${time}`;
+    return time;
 }
 
 // return example: "2023-08-25"
@@ -57,6 +53,11 @@ export function dateFormat(date: Date): string {
     const year = date.getFullYear();
 
     return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+}
+
+// calculate average speed: meters per minute
+export function calculateAvgSpeed(distanceInMeters: number, durationInSeconds: number): number {
+    return Math.round((distanceInMeters / durationInSeconds) * 60 * 100) / 100;
 }
 
 export function humanizedDistance(distanceInMeters: number): string {
@@ -72,15 +73,15 @@ export function humanizedDuration(durationInSeconds: number): string {
     const seconds = durationInSeconds - (hours * 3600) - (minutes * 60);
 
     if (hours > 0) {
-        return `${hours}h ${minutes}m ${seconds}s`;
+        return `${hours} h ${minutes} m ${seconds} s`;
     }
     if (minutes > 0) {
-        return `${minutes}m ${seconds}s`;
+        return `${minutes} m ${seconds} s`;
     }
-    return `${seconds}s`;
+    return `${seconds} s`;
 }
 export function humanizedAvgSpeed(avgSpeedMetersPerSeconds: number): string {
-    return `${(avgSpeedMetersPerSeconds * 3.6).toFixed(2)} km/h`;
+    return `${avgSpeedMetersPerSeconds.toFixed(2)} meters/min`;
 }
 
 const humanizedDistancePartials = (distanceInMeters: number) => {
@@ -116,32 +117,7 @@ export function collectVoices(
     const silenceAudio = "silence-1";
     voices.push(silenceAudio);
 
-    // distance
-    const distancePartials = humanizedDistancePartials(result.distance);
-    voices.push("distance");
-    if (distancePartials.km === 0 && distancePartials.hundreds === 0 && distancePartials.ddm === 0) {
-        voices.push("0");
-    }
-    if (distancePartials.km > 0) {
-        voices.push(distancePartials.km.toString());
-        if (distancePartials.km === 1) {
-            voices.push("kilometer");
-        } else {
-            voices.push("kilometers");
-        }
-    }
-    if (distancePartials.hundreds > 0) {
-        voices.push(distancePartials.hundreds.toString());
-        voices.push("hundred");
-    }
-    if (distancePartials.ddm > 0) {
-        voices.push(distancePartials.ddm.toString());
-    }
-    voices.push("meters");
-
-    if (voices[voices.length - 1] !== silenceAudio) {voices.push(silenceAudio);}
-
-    // duration
+    // TIME
     const durationPartials = humanizedDurationPartials(result.duration);
     voices.push("time");
     if (durationPartials.h === 0 && durationPartials.m === 0 && durationPartials.s === 0) {
@@ -175,27 +151,34 @@ export function collectVoices(
 
     if (voices[voices.length - 1] !== silenceAudio) {voices.push(silenceAudio);}
 
-    // avg_speed
+    // DISTANCE
+    const distancePartials = humanizedDistancePartials(result.distance);
+    voices.push("distance");
+    if (distancePartials.km === 0 && distancePartials.hundreds === 0 && distancePartials.ddm === 0) {
+        voices.push("0");
+    }
+    if (distancePartials.km > 0) {
+        voices.push(distancePartials.km.toString());
+        if (distancePartials.km === 1) {
+            voices.push("kilometer");
+        } else {
+            voices.push("kilometers");
+        }
+    }
+    if (distancePartials.hundreds > 0) {
+        voices.push(distancePartials.hundreds.toString());
+        voices.push("hundred");
+    }
+    if (distancePartials.ddm > 0) {
+        voices.push(distancePartials.ddm.toString());
+    }
+    voices.push("meters");
+
+    if (voices[voices.length - 1] !== silenceAudio) {voices.push(silenceAudio);}
+
+    // AVERAGE SPEED
     if (result.avg_speed > 0) {
         voices.push("average-speed");
-
-        // TODO: remove this block (just another implementation of the same logic)
-        // if (result.avg_speed % 1 !== 0) { // if result.avg_speed is float
-        //     const avgSpeedPartials = result.avg_speed.toString().split('.');
-        //
-        //     const avgSpeedPartialsBeforeDot = avgSpeedPartials[0];
-        //     voices.push(avgSpeedPartialsBeforeDot.toString());
-        //
-        //     voices.push("point");
-        //
-        //     // two digits after the dot will be rounded
-        //     const avgSpeedPartialsAfterDot = avgSpeedPartials[1].slice(0, 3);
-        //     const roundedAfterDot = Math.round(parseInt(avgSpeedPartialsAfterDot) / 10);
-        //
-        //     voices.push(roundedAfterDot.toString());
-        // } else {
-        //     voices.push(result.avg_speed.toString());
-        // }
 
         const avgSpeed = Math.round(result.avg_speed * 100) / 100;
         const avgSpeedPartials = avgSpeed.toString().split('.');
@@ -206,10 +189,10 @@ export function collectVoices(
             voices.push(avgSpeedPartials[1].toString());
         }
 
-        voices.push("kilometers-per-hour");
+        voices.push("meters-per-minute");
     }
 
     if (voices[voices.length - 1] !== silenceAudio) {voices.push(silenceAudio);}
 
     return voices;
-};
+}

@@ -76,6 +76,11 @@ export default function RunScreen() {
     };
     const playSequentialSounds = async (voices: string[]) => {
         const tracks = voices.map(voice => {
+            if (!audioFiles[voice]) {
+                console.error(`Voice ${voice} is not found in audioFiles!`);
+                return;
+            }
+
             return {
                 url: audioFiles[voice].file,
                 title: voice,

@@ -169,11 +169,9 @@ export default function RunProcessingPopup({
                         <Text style={styles.running_info}>
                             Average Speed: {humanizedAvgSpeed(runningResults.avg_speed)}
                         </Text>
-
                         <Text style={styles.running_info}>
                             Running Time: {humanizedDuration(runningTime)}
                         </Text>
-
                         <Text style={styles.running_info}>
                             Time with pauses: {humanizedDuration(timeWithPauses)}
                         </Text>
