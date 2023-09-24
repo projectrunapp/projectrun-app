@@ -23,7 +23,7 @@ const AppLayout = () => {
                     // headerShown: true,
                     tabBarActiveTintColor: appPrimaryColor,
                     headerLeft: () => (<TopHeaderLeft />),
-                    headerRight: () => (<TopHeaderRight />)
+                    headerRight: () => (<TopHeaderRight avatar={authState?.avatar} />)
                 })}>
                     <Tab.Screen name="Home" component={HomeStack} options={{
                         // headerShown: true,

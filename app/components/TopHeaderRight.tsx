@@ -4,7 +4,7 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {useNavigation} from "@react-navigation/native";
 import {userDefaultAvatarUrl} from "../utils/app-constants";
 
-export default function TopHeaderRight() {
+export default function TopHeaderRight({avatar}) {
     const navigation = useNavigation();
 
     const pressSearch = () => {
@@ -23,7 +23,7 @@ export default function TopHeaderRight() {
                 <MaterialCommunityIcons name="magnify" size={30} color="black" />
             </TouchableOpacity>
             <TouchableOpacity onPress={pressProfile} style={styles.profileIcon}>
-                <Image source={{uri: userDefaultAvatarUrl}} style={styles.avatar} />
+                <Image source={{uri: avatar || userDefaultAvatarUrl}} style={styles.avatar} />
             </TouchableOpacity>
         </View>
     );

@@ -162,9 +162,11 @@ export default function ProfileScreen() {
                 },
                 {
                     text: 'Yes',
-                    onPress: () => {
+                    onPress: async () => {
                         if (onLogout) {
-                            onLogout();
+                            setLoading(true);
+                            await onLogout();
+                            setLoading(false);
                         }
                     }
                 }

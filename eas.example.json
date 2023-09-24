@@ -6,8 +6,9 @@
       },
       "env": {
         "JWT_KEY": "SomeRandomLongTextWhichContainsLettersAndNumbers",
-        "API_URL": "https://remote.domain/api",
+        "API_URL": "https://projectrun.app/api",
         "GOOGLE_MAPS_API_KEY": "***",
+        "GOOGLE_WEB_CLIENT_ID": "***",
         "EXPO_PROJECT_ID": "***"
       }
     },

@@ -29,6 +29,7 @@
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "permissions": [
         "ACCESS_BACKGROUND_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -62,7 +63,8 @@
           "photoPermission": "Select and upload a photo",
           "cameraPermission": "Allow $(APP_NAME) to take a picture"
         }
-      ]
+      ],
+      "@react-native-google-signin/google-signin"
     ]
   }
 }

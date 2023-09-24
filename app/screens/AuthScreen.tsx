@@ -25,6 +25,7 @@ import Constants from 'expo-constants';
 import RNDateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker
 import PopupMessage from "../components/PopupMessage";
 import {dateFormat} from "../utils/helper";
+import {GoogleSigninButton} from "@react-native-google-signin/google-signin";
 
 const AuthScreen = () => {
     const [loading, setLoading] = useState<boolean>(false);
@@ -63,7 +64,7 @@ const AuthScreen = () => {
 
     const [showLogin, setShowLogin] = useState<boolean>(true);
 
-    const {onLogin, onRegister} = useAuth();
+    const {onLogin, onRegister, googleSignIn} = useAuth();
 
     const pressLogin = async () => {
         if (!isLoginBtnActive) {
@@ -94,6 +95,15 @@ const AuthScreen = () => {
             setSelectedGender(genders[0].value);
         }
         showPopup(result.success, result.message);
+    }
+
+    const pressGoogleSignIn = async () => {
+        setLoading(true);
+        const result = await googleSignIn!();
+        setLoading(false);
+        if (!result.success) {
+            alert(result.message);
+        }
     }
 
     useEffect(() => {
@@ -188,6 +198,12 @@ const AuthScreen = () => {
                     </Text>
                 </View>
             )}
+            <GoogleSigninButton
+                style={styles.google_sign_in_btn}
+                size={GoogleSigninButton.Size.Standard}
+                color={GoogleSigninButton.Color.Dark}
+                onPress={() => pressGoogleSignIn()}
+            />
         </View>
     );
 };
@@ -206,6 +222,7 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         margin: 10,
+        borderRadius: 50,
     },
     form: {
         gap: 10,
@@ -251,6 +268,11 @@ const styles = StyleSheet.create({
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
+    },
+    google_sign_in_btn: {
+        width: 192,
+        height: 48,
+        marginTop: 40,
     },
 });
 
