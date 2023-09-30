@@ -52,10 +52,6 @@ export const useTaskManager = () => {
         }
     });
 
-    useEffect(() => {
-        initPlayer();
-    }, []);
-
     const registerTask = async () => {
         TaskManager.defineTask(trackingTask.name, async ({ data, error }) => {
             if (error) {
@@ -92,7 +88,9 @@ export const useTaskManager = () => {
 
     // Register the task with TaskManager.
     useEffect(() => {
-        registerTask();
+        initPlayer().then(() => {
+            registerTask();
+        });
     }, []);
 
     const startTask = async () => {

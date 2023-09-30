@@ -28,20 +28,11 @@ npm install
 
 - Get a Google Maps [API key](https://console.cloud.google.com/google/maps-apis/overview) and include it in the `.env` file (see `.env.example` file for reference).
 
-- Run the app:
-```bash
-# for android
-npm run android
-```
+
 
 #### Build the app:
 
 - Make sure to have installed and setup all the necessary things written [here](https://docs.expo.dev/build/setup/)
-
-- Make sure to have installed [eas-cli](https://github.com/expo/eas-cli)
-```bash
-npm install -g eas-cli
-```
 
 - Make sure to have `eas.json` file in the root directory of the project similar to the `eas.example.json` file.
 
@@ -49,29 +40,60 @@ npm install -g eas-cli
 
 - [Build APKs for Android Emulators and devices](https://docs.expo.dev/build-reference/apk/)
 
-```bash
-# build for android using Expo servers
-eas build -p android --profile preview
 
-# build for android using local machine
-eas build -p android --profile preview --local
+
+#### Commands:
+
+- Make sure to have installed [eas-cli](https://github.com/expo/eas-cli) globally:
+```shell
+npm install -g eas-cli
 ```
 
-- Optional:
+- Generate `eas.json` file:
 ```bash
-# generate `eas.json` file
 eas build:configure
+```
 
-# build for android
-eas build --profile development --platform android
+- Build the app (using Expo CLI):
+```bash
+eas build --platform <PLATFORM> --profile <PROFILE> [--local]
+```
 
-# start dev client
+- Build command examples:
+```bash
+# build for android with preview profile using Expo servers
+eas build --platform android --profile preview
+
+# build for android with development profile using Expo servers
+eas build --platform android --profile development
+
+# build for android with development profile using local machine
+eas build --platform android --profile preview --local
+
+# build for android with development profile using local machine
+eas build --platform android --profile development --local
+```
+
+- Build the app (using React Native CLI) for android:
+```bash
+npx react-native run-android
+```
+
+- Start development server for development builds:
+```bash
 expo start --dev-client
 ```
 
+- Run the app (for android):
+```bash
+npm run android
+# OR
+expo run:android
+```
 
 
-#### Info:
+
+#### Audio commands:
 
 - Run this to get audio file duration:
 ```shell
