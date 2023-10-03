@@ -1,23 +1,36 @@
 
-import {Image, StyleSheet, Text, View} from "react-native";
+import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {useNavigation} from "@react-navigation/native";
+import {splashLogoUrl} from "../../utils/app-constants";
 
 const ListUserItem = ({ item, actionButtons }: any) => {
-    // TODO: change to default avatar
+    const navigation = useNavigation();
+
+    const navigateToProfile = (userId: number) => {
+        // @ts-ignore
+        navigation.navigate("Friendship", {
+            screen: "ProfileForGuestScreen",
+            params: {
+                userId,
+            }
+        });
+    };
+
     return (
-        <View style={styles.list_item}>
-            <Image source={{
-                uri: item.avatar ? item.avatar : `https://picsum.photos/id/${item.id}/50/50`
-            }} style={styles.user_avatar}/>
-            <View style={styles.user_info_container}>
-                <Text style={[styles.user_info, styles.user_info_name]}>{item.name.length > 23 ? item.name.substring(0, 20) + '...' : item.name}</Text>
-                <Text style={[styles.user_info, styles.user_info_username]}>@{item.username}</Text>
-            </View>
-            {actionButtons && (
-                <View style={styles.action_buttons_container}>
-                    {actionButtons}
+        <TouchableOpacity onPress={() => navigateToProfile(item.id)}>
+            <View style={styles.list_item}>
+                <Image source={{uri: item.avatar ? item.avatar : splashLogoUrl}} style={styles.user_avatar}/>
+                <View style={styles.user_info_container}>
+                    <Text style={[styles.user_info, styles.user_info_name]}>{item.name.length > 23 ? item.name.substring(0, 20) + '...' : item.name}</Text>
+                    <Text style={[styles.user_info, styles.user_info_username]}>@{item.username}</Text>
                 </View>
-            )}
-        </View>
+                {actionButtons && (
+                    <View style={styles.action_buttons_container}>
+                        {actionButtons}
+                    </View>
+                )}
+            </View>
+        </TouchableOpacity>
     );
 };
 

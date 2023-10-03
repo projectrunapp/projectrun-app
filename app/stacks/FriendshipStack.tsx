@@ -2,6 +2,7 @@
 import FriendshipScreen from "../screens/FriendshipScreen";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import SearchScreen from "../screens/SearchScreen";
+import ProfileForGuestScreen from "../screens/ProfileForGuestScreen";
 
 const FriendshipStack = () => {
     const Stack = createNativeStackNavigator();
@@ -17,6 +18,10 @@ const FriendshipStack = () => {
             <Stack.Screen name="SearchScreen" component={SearchScreen} options={{
                 // headerShown: true,
                 title: 'Search Page',
+            }}/>
+            <Stack.Screen name="ProfileForGuestScreen" component={ProfileForGuestScreen} options={{
+                // headerShown: true,
+                title: 'Profile For Guest Page',
             }}/>
         </Stack.Navigator>
     );

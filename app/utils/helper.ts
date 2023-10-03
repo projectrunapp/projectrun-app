@@ -55,6 +55,19 @@ export function dateFormat(date: Date): string {
     return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
 }
 
+// input: "2003-08-25"; output: 18
+export function getAgeFromBirthDate(birthDate: string): number {
+    const today = new Date();
+    const birthDateObj = new Date(birthDate);
+    let age = today.getFullYear() - birthDateObj.getFullYear();
+    const month = today.getMonth() - birthDateObj.getMonth();
+    if (month < 0 || (month === 0 && today.getDate() < birthDateObj.getDate())) {
+        age--;
+    }
+
+    return age;
+}
+
 // calculate average speed: meters per minute
 export function calculateAvgSpeed(distanceInMeters: number, durationInSeconds: number): number {
     return Math.round((distanceInMeters / durationInSeconds) * 60 * 100) / 100;

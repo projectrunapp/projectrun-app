@@ -51,6 +51,7 @@ export default function ProfileScreen() {
     const [avatar, setAvatar] = useState<string>('');
 
     const [birthDate, setBirthDate] = useState<string>('');
+    const [bio, setBio] = useState<string>('');
     const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
     const [date, setDate] = useState(new Date(Date.now()));
     const changeDate = (event: any, selectedDate: any) => {
@@ -75,6 +76,7 @@ export default function ProfileScreen() {
                 email: response.data.email,
                 username: response.data.username,
                 birth_date: response.data.birth_date,
+                bio: response.data.bio,
                 gender: response.data.gender,
                 avatar: response.data.avatar,
             });
@@ -92,6 +94,7 @@ export default function ProfileScreen() {
                 name: name,
                 birth_date: birthDate,
                 gender: selectedGender,
+                bio: bio,
             }, {
                 headers: {
                     Authorization: `Bearer ${authState!.token}`,
@@ -103,6 +106,7 @@ export default function ProfileScreen() {
                 username: username,
                 name: name,
                 birth_date: birthDate,
+                bio: bio,
                 gender: selectedGender,
             });
 
@@ -136,6 +140,7 @@ export default function ProfileScreen() {
         setUsername(storageUser.username);
         setName(storageUser.name);
         setBirthDate(storageUser.birth_date);
+        setBio(storageUser.bio);
         setSelectedGender(storageUser.gender);
         setAvatar(storageUser.avatar);
 
@@ -144,7 +149,7 @@ export default function ProfileScreen() {
 
     useEffect(() => {
         setIsUpdateBtnActive(!!(username && name && birthDate));
-    }, [username, name, birthDate]);
+    }, [username, name, birthDate, bio]);
 
     useEffect(() => {
         getProfile();
@@ -223,6 +228,11 @@ export default function ProfileScreen() {
                             ))}
                         </Picker>
                     </View>
+                    <TextInput style={styles.text_input}
+                               placeholder="Bio"
+                               multiline={true}
+                               onChangeText={(text: string) => setBio(text)}
+                               value={bio}/>
 
                     <Pressable style={[styles.submit_btn, {
                         backgroundColor: isUpdateBtnActive ? appPrimaryColor : '#ccc',
@@ -282,6 +292,16 @@ const styles = StyleSheet.create({
     },
     input_picker: {
         height: 44,
+    },
+    text_input: {
+        height: 100,
+        borderWidth: 1,
+        borderRadius: 4,
+        padding: 10,
+        color: '#000',
+        backgroundColor: '#fff',
+        textAlignVertical: 'top',
+        flexWrap: 'wrap',
     },
     container: {
         marginTop: 10,

@@ -9,15 +9,15 @@ interface AuthProps {
     authState?: {
         authenticated: boolean, token: string | null,
         id: number | null, name: string | null, email: string | null, username: string | null,
-        birth_date: string | null, gender: string, avatar: string | null,
+        birth_date: string | null, gender: string, avatar: string | null, bio: string | null,
     },
     getStorageUser?: () => Promise<{
         id: number | null, name: string | null, email: string | null, username: string | null,
-        birth_date: string | null, gender: string, avatar: string | null,
+        birth_date: string | null, gender: string, avatar: string | null, bio: string | null,
     }>,
     setStorageUser?: (userData: {
         id?: number, name?: string, email?: string, username?: string,
-        birth_date?: string, gender?: string, avatar?: string,
+        birth_date?: string, gender?: string, avatar?: string, bio: string | null,
     }) => Promise<void>,
     onRegister?: (email: string, password: string, username: string, name: string,
                   birth_date: string, gender: string) => Promise<any>,
@@ -36,11 +36,11 @@ export const AuthProvider = ({children}: any) => {
     const [authState, setAuthState] = useState<{
         authenticated: boolean, token: string | null,
         id: number | null, name: string | null, email: string | null, username: string | null,
-        birth_date: string | null, gender: string, avatar: string | null,
+        birth_date: string | null, gender: string, avatar: string | null, bio: string | null,
     }>({
         authenticated: false, token: null,
         id: null, name: null, email: null, username: null,
-        birth_date: null, gender: 'unknown', avatar: null,
+        birth_date: null, gender: 'unknown', avatar: null, bio: null,
     });
 
     const getStorageUser = async () => {
@@ -49,17 +49,18 @@ export const AuthProvider = ({children}: any) => {
         const email = await AsyncStorage.getItem('user_email');
         const username = await AsyncStorage.getItem('user_username');
         const birth_date = await AsyncStorage.getItem('user_birth_date');
+        const bio = await AsyncStorage.getItem('user_bio');
         const gender = await AsyncStorage.getItem('user_gender');
         const avatar = await AsyncStorage.getItem('user_avatar');
 
         return {
             id: id ? parseInt(id) : null, name: name, email: email, username: username,
-            birth_date: birth_date, gender: gender, avatar: avatar,
+            birth_date: birth_date, gender: gender, avatar: avatar, bio: bio,
         }
     }
     const setStorageUser = async (userData: {
         id?: number, name?: string, email?: string, username?: string,
-        birth_date?: string, gender?: string, avatar?: string,
+        birth_date?: string, gender?: string, avatar?: string, bio?: string,
     }) =>
     {
         if (userData.id) { await AsyncStorage.setItem('user_id', userData.id.toString()); }
@@ -67,6 +68,7 @@ export const AuthProvider = ({children}: any) => {
         if (userData.email) { await AsyncStorage.setItem('user_email', userData.email); }
         if (userData.username) { await AsyncStorage.setItem('user_username', userData.username); }
         if (userData.birth_date) { await AsyncStorage.setItem('user_birth_date', userData.birth_date); }
+        if (userData.bio) { await AsyncStorage.setItem('user_bio', userData.bio); }
         if (userData.gender) { await AsyncStorage.setItem('user_gender', userData.gender); }
         if (userData.avatar) { await AsyncStorage.setItem('user_avatar', userData.avatar); }
     };
@@ -76,6 +78,7 @@ export const AuthProvider = ({children}: any) => {
         await AsyncStorage.setItem('user_email', '');
         await AsyncStorage.setItem('user_username', '');
         await AsyncStorage.setItem('user_birth_date', '');
+        await AsyncStorage.setItem('user_bio', '');
         await AsyncStorage.setItem('user_gender', '');
         await AsyncStorage.setItem('user_avatar', '');
     };
@@ -91,13 +94,13 @@ export const AuthProvider = ({children}: any) => {
 
             await setStorageUser({
                 id: userData.id, name: userData.name, email: userData.email, username: userData.username,
-                birth_date: userData.birth_date, gender: userData.gender, avatar: userData.avatar,
+                birth_date: userData.birth_date, gender: userData.gender, avatar: userData.avatar, bio: userData.bio,
             });
 
             setAuthState({
                 authenticated: true, token: userData.access_token,
                 id: userData.id, name: userData.name, email: userData.email, username: userData.username,
-                birth_date: userData.birth_date, gender: userData.gender, avatar: userData.avatar,
+                birth_date: userData.birth_date, gender: userData.gender, avatar: userData.avatar, bio: userData.bio,
             });
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
@@ -142,7 +145,7 @@ export const AuthProvider = ({children}: any) => {
         setAuthState({
             authenticated: false, token: null,
             id: null, name: null, email: null, username: null,
-            birth_date: null, gender: 'unknown', avatar: null,
+            birth_date: null, gender: 'unknown', avatar: null, bio: null,
         });
     }
 
@@ -150,12 +153,12 @@ export const AuthProvider = ({children}: any) => {
         const token = await SecureStore.getItemAsync(process.env.JWT_KEY);
         // TODO: load user data (id, email) by extracting JWT token
         if (token) {
-            const {id, name, email, username, birth_date, gender, avatar} = await getStorageUser();
+            const {id, name, email, username, birth_date, gender, avatar, bio} = await getStorageUser();
 
             setAuthState({
                 authenticated: true, token: token,
                 id, name, email, username,
-                birth_date, gender: gender || 'unknown', avatar,
+                birth_date, gender: gender || 'unknown', avatar, bio,
             });
         }
     };
@@ -182,13 +185,13 @@ export const AuthProvider = ({children}: any) => {
 
             await setStorageUser({
                 id: userData.id, name: userData.name, email: userData.email, username: userData.username,
-                gender: userData.gender, birth_date: userData.birth_date, avatar: userData.avatar,
+                gender: userData.gender, birth_date: userData.birth_date, avatar: userData.avatar, bio: userData.bio,
             });
 
             setAuthState({
                 authenticated: true, token: userData.access_token,
                 id: userData.id, name: userData.name, email: userData.email, username: userData.username,
-                gender: userData.gender, birth_date: userData.birth_date, avatar: userData.avatar,
+                gender: userData.gender, birth_date: userData.birth_date, avatar: userData.avatar, bio: userData.bio,
             });
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
