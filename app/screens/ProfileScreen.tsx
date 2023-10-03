@@ -1,22 +1,13 @@
 
 import {
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
-    TouchableOpacity,
-    ActivityIndicator, Alert, ScrollView
+    Platform, Pressable, StyleSheet, Text, TextInput,
+    View, TouchableOpacity, ActivityIndicator, Alert, ScrollView
 } from "react-native";
 import {Picker} from '@react-native-picker/picker';
 import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext";
-import { genders } from "../utils/enums";
 import {
-    activeBtnTextColor,
-    appPrimaryColor,
-    inactiveBtnTextColor,
+    activeBtnTextColor, appPrimaryColor, genderDefault, genders, inactiveBtnTextColor,
 } from "../utils/app-constants";
 import RNDateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker
 import PopupMessage from "../components/PopupMessage";
@@ -47,7 +38,7 @@ export default function ProfileScreen() {
     const [email, setEmail] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [name, setName] = useState<string>('');
-    const [selectedGender, setSelectedGender] = useState<string>(genders[0].value);
+    const [selectedGender, setSelectedGender] = useState<string>(genderDefault);
     const [avatar, setAvatar] = useState<string>('');
 
     const [birthDate, setBirthDate] = useState<string>('');
@@ -126,30 +117,26 @@ export default function ProfileScreen() {
         showPopup(result.success, result.message);
     }
     const getProfile = async () => {
-        let storageUser = await getStorageUser!();
-        if (!storageUser.email) {
-            const response = await getMe(); // storageUser will be updated in getMe()
-            if (!response.success) {
-                return;
-            }
-
-            storageUser = response.data;
+        // it got from storage before (commit: b2c9f6e)
+        const response = await getMe(); // storageUser will be updated in getMe()
+        if (!response.success) {
+            return;
         }
 
-        setEmail(storageUser.email);
-        setUsername(storageUser.username);
-        setName(storageUser.name);
-        setBirthDate(storageUser.birth_date);
-        setBio(storageUser.bio);
-        setSelectedGender(storageUser.gender);
-        setAvatar(storageUser.avatar);
+        setEmail(response.data.email);
+        setUsername(response.data.username);
+        setName(response.data.name);
+        setBirthDate(response.data.birth_date);
+        setBio(response.data.bio);
+        setSelectedGender(response.data.gender);
+        setAvatar(response.data.avatar);
 
-        setDate(new Date(storageUser.birth_date || Date.now()));
+        setDate(new Date(response.data.birth_date || Date.now()));
     }
 
     useEffect(() => {
         setIsUpdateBtnActive(!!(username && name && birthDate));
-    }, [username, name, birthDate, bio]);
+    }, [username, name, birthDate]);
 
     useEffect(() => {
         getProfile();
@@ -219,14 +206,16 @@ export default function ProfileScreen() {
                     <View style={styles.picker_container}>
                         <Picker onValueChange={(itemValue, itemIndex) => setSelectedGender(itemValue)}
                                 style={styles.input_picker}
-                                selectedValue={selectedGender}>
-                            {genders.map((option, index) => (
-                                <Picker.Item style={index === 0 ? {
-                                    color: '#9e9e9e',
-                                    fontSize: 14,
-                                } : {}} key={index} label={option.label} value={option.value}/>
-                            ))}
-                        </Picker>
+                                selectedValue={selectedGender}>{
+                            Object.keys(genders).map((key, index) => {
+                                return (
+                                    <Picker.Item key={index}
+                                                 style={key === genderDefault ? {color: '#9e9e9e', fontSize: 14} : {}}
+                                                 label={genders[key]} value={key}
+                                    />
+                                )
+                            })
+                        }</Picker>
                     </View>
                     <TextInput style={styles.text_input}
                                placeholder="Bio"

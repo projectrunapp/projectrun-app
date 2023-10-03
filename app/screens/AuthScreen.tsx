@@ -1,25 +1,14 @@
 
 import {
-    Image,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
-    TouchableOpacity,
-    ActivityIndicator
+    Image, ActivityIndicator, Platform, StyleSheet, View,
+    Text, TextInput, TouchableOpacity, Pressable
 } from "react-native";
 import {Picker} from '@react-native-picker/picker';
 import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext";
-import { genders } from "../utils/enums";
 import {
-    activeBtnTextColor,
-    appPrimaryColor,
-    appSecondaryColor,
-    inactiveBtnTextColor,
-    splashLogoUrl
+    activeBtnTextColor, appPrimaryColor, appSecondaryColor,
+    genderDefault, genders, inactiveBtnTextColor, splashLogoUrl
 } from "../utils/app-constants";
 import Constants from 'expo-constants';
 import RNDateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker
@@ -50,7 +39,7 @@ export default function AuthScreen() {
     const [registerPassword, setRegisterPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [name, setName] = useState<string>('');
-    const [selectedGender, setSelectedGender] = useState<string>(genders[0].value);
+    const [selectedGender, setSelectedGender] = useState<string>(genderDefault);
 
     const [birthDate, setBirthDate] = useState<string>('');
     const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
@@ -92,7 +81,7 @@ export default function AuthScreen() {
             setUsername('');
             setName('');
             setBirthDate('');
-            setSelectedGender(genders[0].value);
+            setSelectedGender(genderDefault);
         }
         showPopup(result.success, result.message);
     }
@@ -175,14 +164,16 @@ export default function AuthScreen() {
                     )}
                     <View style={styles.picker_container}>
                         <Picker onValueChange={(itemValue, itemIndex) => setSelectedGender(itemValue)}
-                                selectedValue={selectedGender}>
-                            {genders.map((option, index) => (
-                                <Picker.Item style={index === 0 ? {
-                                    color: '#9e9e9e',
-                                    fontSize: 14,
-                                } : {}} key={index} label={option.label} value={option.value}/>
-                            ))}
-                        </Picker>
+                                selectedValue={selectedGender}>{
+                            Object.keys(genders).map((key, index) => {
+                                return (
+                                    <Picker.Item key={index}
+                                                 style={key === genderDefault ? {color: '#9e9e9e', fontSize: 14} : {}}
+                                                 label={genders[key]} value={key}
+                                    />
+                                )
+                            })
+                        }</Picker>
                     </View>
 
                     <Pressable style={[styles.submit_btn, {

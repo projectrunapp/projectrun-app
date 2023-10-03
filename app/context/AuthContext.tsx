@@ -44,43 +44,28 @@ export const AuthProvider = ({children}: any) => {
     });
 
     const getStorageUser = async () => {
-        const id = await AsyncStorage.getItem('user_id');
-        const name = await AsyncStorage.getItem('user_name');
-        const email = await AsyncStorage.getItem('user_email');
-        const username = await AsyncStorage.getItem('user_username');
-        const birth_date = await AsyncStorage.getItem('user_birth_date');
-        const bio = await AsyncStorage.getItem('user_bio');
-        const gender = await AsyncStorage.getItem('user_gender');
-        const avatar = await AsyncStorage.getItem('user_avatar');
-
-        return {
-            id: id ? parseInt(id) : null, name: name, email: email, username: username,
-            birth_date: birth_date, gender: gender, avatar: avatar, bio: bio,
+        const userData = await AsyncStorage.getItem('user_data');
+        if (!userData) {
+            return {
+                id: null, name: null, email: null, username: null,
+                gender: 'unknown', birth_date: null, avatar: null, bio: null,
+            };
         }
+
+        return JSON.parse(userData);
     }
     const setStorageUser = async (userData: {
         id?: number, name?: string, email?: string, username?: string,
         birth_date?: string, gender?: string, avatar?: string, bio?: string,
     }) =>
     {
-        if (userData.id) { await AsyncStorage.setItem('user_id', userData.id.toString()); }
-        if (userData.name) { await AsyncStorage.setItem('user_name', userData.name); }
-        if (userData.email) { await AsyncStorage.setItem('user_email', userData.email); }
-        if (userData.username) { await AsyncStorage.setItem('user_username', userData.username); }
-        if (userData.birth_date) { await AsyncStorage.setItem('user_birth_date', userData.birth_date); }
-        if (userData.bio) { await AsyncStorage.setItem('user_bio', userData.bio); }
-        if (userData.gender) { await AsyncStorage.setItem('user_gender', userData.gender); }
-        if (userData.avatar) { await AsyncStorage.setItem('user_avatar', userData.avatar); }
+        await AsyncStorage.setItem('user_data', JSON.stringify({
+            id: userData.id, name: userData.name, email: userData.email, username: userData.username,
+            birth_date: userData.birth_date, bio: userData.bio, gender: userData.gender, avatar: userData.avatar,
+        }));
     };
     const clearStorageUser = async () => {
-        await AsyncStorage.setItem('user_id', '');
-        await AsyncStorage.setItem('user_name', '');
-        await AsyncStorage.setItem('user_email', '');
-        await AsyncStorage.setItem('user_username', '');
-        await AsyncStorage.setItem('user_birth_date', '');
-        await AsyncStorage.setItem('user_bio', '');
-        await AsyncStorage.setItem('user_gender', '');
-        await AsyncStorage.setItem('user_avatar', '');
+        await AsyncStorage.removeItem('user_data');
     };
 
     const login = async (email: string, password: string) => {

@@ -7,12 +7,18 @@ export const paginationPerPages = [5, 10, 25, 50];
 export const activeBtnTextColor = '#fff';
 export const inactiveBtnTextColor = '#000';
 
-export const userDefaultAvatarUrl = "https://avatars.githubusercontent.com/u/22226570?s=96&v=4";
-
 export const popupOptions = {
     close_timeout_seconds: 2,
     success_color: '#96C291',
     error_color: '#E25E3E',
+};
+
+export const genderDefault = 'unknown';
+export const genders = {
+    'unknown': "Unknown",
+    'male': "Male",
+    'female': "Female",
+    'other': "Other",
 };
 
 export const updateLocationTimeoutSeconds = 5; // 3-20
