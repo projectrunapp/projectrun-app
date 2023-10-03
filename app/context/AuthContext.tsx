@@ -17,7 +17,7 @@ interface AuthProps {
     }>,
     setStorageUser?: (userData: {
         id?: number, name?: string, email?: string, username?: string,
-        birth_date?: string, gender?: string, avatar?: string, bio: string | null,
+        birth_date?: string, gender?: string, avatar?: string, bio?: string,
     }) => Promise<void>,
     onRegister?: (email: string, password: string, username: string, name: string,
                   birth_date: string, gender: string) => Promise<any>,
@@ -134,8 +134,11 @@ export const AuthProvider = ({children}: any) => {
     const logout = async () => {
         await SecureStore.deleteItemAsync(process.env.JWT_KEY);
 
-        await GoogleSignin.revokeAccess();
-        await GoogleSignin.signOut();
+        const isSignedInWithGoogle = await GoogleSignin.isSignedIn();
+        if (isSignedInWithGoogle) {
+            await GoogleSignin.revokeAccess();
+            await GoogleSignin.signOut();
+        }
 
         axios.defaults.headers.common['Authorization'] = '';
         // axios.defaults.headers.common['Content-Type'] = 'application/json';
