@@ -27,7 +27,7 @@ import PopupMessage from "../components/PopupMessage";
 import {dateFormat} from "../utils/helper";
 import {GoogleSigninButton} from "@react-native-google-signin/google-signin";
 
-const AuthScreen = () => {
+export default function AuthScreen() {
     const [loading, setLoading] = useState<boolean>(false);
     const [isLoginBtnActive, setIsLoginBtnActive] = useState<boolean>(false);
     const [isRegisterBtnActive, setIsRegisterBtnActive] = useState<boolean>(false);
@@ -275,5 +275,3 @@ const styles = StyleSheet.create({
         marginTop: 40,
     },
 });
-
-export default AuthScreen;

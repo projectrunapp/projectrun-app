@@ -4,7 +4,7 @@ import {Alert, StyleSheet, TouchableOpacity, View} from "react-native";
 import {useAuth} from "../../context/AuthContext";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
-const CancelButtonForSentFriendRequest = ({ item, showPopup, removeFriendRequest }) => {
+export default function CancelButtonForSentFriendRequest({ item, showPopup, removeFriendRequest }) {
     const { authState } = useAuth();
 
     const cancelFriendRequest = async () => {
@@ -66,5 +66,3 @@ const styles = StyleSheet.create({
         padding: 5,
     },
 });
-
-export default CancelButtonForSentFriendRequest;

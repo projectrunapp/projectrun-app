@@ -8,7 +8,7 @@ import ActionButtonsForReceivedFriendRequest from "./ActionButtonsForReceivedFri
 import {useFriendshipRefresh} from "../../context/FriendshipRefreshContext";
 import PopupMessage from "../../components/PopupMessage";
 
-const ReceivedFriendRequestsScreen = () => {
+export default function ReceivedFriendRequestsScreen() {
     const { receivedFriendRequestsLastRefreshedTime, updateFriendsLastRefreshedTime } = useFriendshipRefresh();
     const { authState } = useAuth();
     const [loading, setLoading] = useState(true);
@@ -127,5 +127,3 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 });
-
-export default ReceivedFriendRequestsScreen;

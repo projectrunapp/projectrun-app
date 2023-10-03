@@ -4,7 +4,7 @@ import {View, Text, Modal, TouchableOpacity, StyleSheet} from 'react-native';
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {popupOptions} from "../utils/app-constants";
 
-const PopupMessage = ({ isVisible, message, success, onClose }) => {
+export default function PopupMessage({ isVisible, message, success, onClose }) {
     useEffect(() => {
         if (isVisible) {
             const timeoutId = setTimeout(() => {
@@ -56,5 +56,3 @@ const styles = StyleSheet.create({
         marginLeft: 20,
     }
 });
-
-export default PopupMessage;

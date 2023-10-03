@@ -8,7 +8,7 @@ import UnfriendButton from "./UnfriendButton";
 import {useFriendshipRefresh} from "../../context/FriendshipRefreshContext";
 import PopupMessage from "../../components/PopupMessage";
 
-const FriendsScreen = () => {
+export default function FriendsScree() {
     const { friendsLastRefreshedTime } = useFriendshipRefresh();
     const { authState, getStorageUser } = useAuth();
     const [authUserId, setAuthUserId] = useState<number | null>(null);
@@ -138,5 +138,3 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 });
-
-export default FriendsScreen;

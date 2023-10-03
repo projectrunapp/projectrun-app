@@ -8,7 +8,7 @@ import RunMap from "../components/RunMap";
 import PopupMessage from "../components/PopupMessage";
 import {useRunData} from "../context/RunDataContext";
 
-const SingleRunScreen = ({ route }: any) => {
+export default function SingleRunScreen({ route }: any) {
     const {storageGetRun, storageGetRunCoordinates} = useRunData();
 
     const { runId, title, popup } = route.params;
@@ -168,5 +168,3 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
 });
-
-export default SingleRunScreen;

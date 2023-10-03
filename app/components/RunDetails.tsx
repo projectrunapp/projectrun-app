@@ -2,7 +2,7 @@
 import {StyleSheet, Text, View} from "react-native";
 import {dateStringFormat, humanizedAvgSpeed, humanizedDistance, humanizedDuration} from "../utils/helper";
 
-export default function({ run }: {
+export default function RunDetails({ run }: {
     run: {
         title: string,
         started: number,

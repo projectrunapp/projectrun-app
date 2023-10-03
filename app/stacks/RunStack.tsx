@@ -3,7 +3,7 @@ import RunScreen from "../screens/RunScreen";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import SingleRunScreen from "../screens/SingleRunScreen";
 
-const RunStack = () => {
+export default function RunStack() {
     const Stack = createNativeStackNavigator();
 
     return (
@@ -20,5 +20,3 @@ const RunStack = () => {
         </Stack.Navigator>
     );
 }
-
-export default RunStack;

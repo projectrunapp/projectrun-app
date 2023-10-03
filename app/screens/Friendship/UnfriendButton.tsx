@@ -4,7 +4,7 @@ import {Alert, StyleSheet, TouchableOpacity, View} from "react-native";
 import {useAuth} from "../../context/AuthContext";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
-const UnfriendButton = ({ item, showPopup, removeFriend }) => {
+export default function UnfriendButton({ item, showPopup, removeFriend }) {
     const { authState } = useAuth();
 
     const unfriend = async () => {
@@ -67,5 +67,3 @@ const styles = StyleSheet.create({
         padding: 5,
     },
 });
-
-export default UnfriendButton;

@@ -4,7 +4,7 @@ import {Alert, StyleSheet, TouchableOpacity, View} from "react-native";
 import {useAuth} from "../../context/AuthContext";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
-const ActionButtonsForReceivedFriendRequest = ({ item, showPopup, removeFriendRequest }) => {
+export default function ActionButtonsForReceivedFriendRequest({ item, showPopup, removeFriendRequest }) {
     const { authState } = useAuth();
 
     const acceptFriendRequest = async () => {
@@ -111,5 +111,3 @@ const styles = StyleSheet.create({
         padding: 5,
     },
 });
-
-export default ActionButtonsForReceivedFriendRequest;

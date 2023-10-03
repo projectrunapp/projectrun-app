@@ -8,7 +8,7 @@ import CancelButtonForSentFriendRequest from "./CancelButtonForSentFriendRequest
 import {useFriendshipRefresh} from "../../context/FriendshipRefreshContext";
 import PopupMessage from "../../components/PopupMessage";
 
-const SentFriendRequestsScreen = () => {
+export default function SentFriendRequestsScreen() {
     const { sentFriendRequestsLastRefreshedTime } = useFriendshipRefresh();
     const { authState } = useAuth();
     const [loading, setLoading] = useState(true);
@@ -125,5 +125,3 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 });
-
-export default SentFriendRequestsScreen;

@@ -3,7 +3,7 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 import {splashLogoUrl} from "../../utils/app-constants";
 
-const ListUserItem = ({ item, actionButtons }: any) => {
+export default function ListUserItem({ item, actionButtons }: any) {
     const navigation = useNavigation();
 
     const navigateToProfile = (userId: number) => {
@@ -65,5 +65,3 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
 });
-
-export default ListUserItem;

@@ -9,7 +9,7 @@ import ActionButtonsForSearchedUser from "./Friendship/ActionButtonsForSearchedU
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import PopupMessage from "../components/PopupMessage";
 
-const SearchScreen = () => {
+export default function SearchScreen() {
     const { authState } = useAuth();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -146,5 +146,3 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     }
 });
-
-export default SearchScreen;

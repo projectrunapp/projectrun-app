@@ -6,12 +6,12 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {useState} from "react";
 import {useFriendshipRefresh} from "../../context/FriendshipRefreshContext";
 
-const ActionButtonsForSearchedUser = ({
+export default function ActionButtonsForSearchedUser({
                                           item,
                                           showPopup,
                                           titles, // optional (defined for profile screen)
                                           setFriendsCount, // optional (defined for profile screen)
-}) => {
+}) {
     const {
         updateFriendsLastRefreshedTime,
         updateReceivedFriendRequestsLastRefreshedTime,
@@ -309,5 +309,3 @@ const styles = StyleSheet.create({
         padding: 5,
     },
 });
-
-export default ActionButtonsForSearchedUser;

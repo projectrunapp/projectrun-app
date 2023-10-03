@@ -4,7 +4,7 @@ import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import SearchScreen from "../screens/SearchScreen";
 import ProfileForGuestScreen from "../screens/ProfileForGuestScreen";
 
-const FriendshipStack = () => {
+export default function FriendshipStack() {
     const Stack = createNativeStackNavigator();
 
     return (
@@ -26,5 +26,3 @@ const FriendshipStack = () => {
         </Stack.Navigator>
     );
 }
-
-export default FriendshipStack;

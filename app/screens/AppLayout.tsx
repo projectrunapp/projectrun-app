@@ -13,7 +13,7 @@ import TopHeaderLeft from "../components/TopHeaderLeft";
 
 const Tab = createBottomTabNavigator();
 
-const AppLayout = () => {
+export default function AppLayout() {
     const { authState } = useAuth();
 
     return (
@@ -53,5 +53,3 @@ const AppLayout = () => {
         </NavigationContainer>
     );
 };
-
-export default AppLayout;

@@ -7,7 +7,7 @@ import {paginationPerPages} from "../utils/app-constants";
 import {useNavigation} from "@react-navigation/native";
 import {Alert} from "react-native";
 
-const RunsDataTable = () => {
+export default function RunsDataTable() {
     const navigation = useNavigation();
     const { authState } = useAuth();
 
@@ -93,5 +93,3 @@ const RunsDataTable = () => {
         </DataTable>
     );
 };
-
-export default RunsDataTable;
