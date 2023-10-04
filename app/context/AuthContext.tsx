@@ -4,6 +4,7 @@ import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {GoogleSignin, NativeModuleError, statusCodes} from "@react-native-google-signin/google-signin";
+import {genderDefault} from "../utils/app-constants";
 
 interface AuthProps {
     authState?: {
@@ -40,7 +41,7 @@ export const AuthProvider = ({children}: any) => {
     }>({
         authenticated: false, token: null,
         id: null, name: null, email: null, username: null,
-        birth_date: null, gender: 'unknown', avatar: null, bio: null,
+        birth_date: null, gender: genderDefault, avatar: null, bio: null,
     });
 
     const getStorageUser = async () => {
@@ -48,7 +49,7 @@ export const AuthProvider = ({children}: any) => {
         if (!userData) {
             return {
                 id: null, name: null, email: null, username: null,
-                gender: 'unknown', birth_date: null, avatar: null, bio: null,
+                gender: genderDefault, birth_date: null, avatar: null, bio: null,
             };
         }
 
@@ -133,7 +134,7 @@ export const AuthProvider = ({children}: any) => {
         setAuthState({
             authenticated: false, token: null,
             id: null, name: null, email: null, username: null,
-            birth_date: null, gender: 'unknown', avatar: null, bio: null,
+            birth_date: null, gender: genderDefault, avatar: null, bio: null,
         });
     }
 
@@ -146,7 +147,7 @@ export const AuthProvider = ({children}: any) => {
             setAuthState({
                 authenticated: true, token: token,
                 id, name, email, username,
-                birth_date, gender: gender || 'unknown', avatar, bio,
+                birth_date, gender: gender || genderDefault, avatar, bio,
             });
         }
     };

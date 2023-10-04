@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react'
 import {StyleSheet, Text, View, Image, ScrollView} from 'react-native'
 import axios from "axios";
-import {appSecondaryColor, splashLogoUrl} from "../utils/app-constants";
+import {appSecondaryColor, genderDefault, splashLogoUrl} from "../utils/app-constants";
 import {useAuth} from "../context/AuthContext";
 import ActionButtonsForSearchedUser from "./Friendship/ActionButtonsForSearchedUser";
 import PopupMessage from "../components/PopupMessage";
@@ -87,7 +87,7 @@ export default function ProfileForGuestScreen({ route }: any) {
                 <View style={styles.content}>
                     <Text style={styles.content_title}>About:</Text>
                     <Text>
-                        Gender: {profile.gender !== 'unknown' && (<>
+                        Gender: {profile.gender !== genderDefault && (<>
                             {
                                 profile.gender === 'male' && (
                                     <MaterialCommunityIcons name="gender-male" size={18} style={styles.content_gender_sign}/>
