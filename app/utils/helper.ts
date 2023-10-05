@@ -28,8 +28,9 @@ export function generateRunTitle(hour?: number): string {
     return title;
 }
 
+// TODO: remove this block
 // example: convert "2023-08-25T07:07:26.240Z" to "Aug 25, 2023; 7:07 AM"
-export function dateStringFormat(dateString: number): string {
+export function dateStringFormatV1(dateString: number): string {
     const date = new Date(dateString);
 
     // const month = date.toLocaleString('default', { month: 'short' });
@@ -44,6 +45,41 @@ export function dateStringFormat(dateString: number): string {
 
     // return `${month} ${day}, ${year}; ${time}`;
     return time;
+}
+
+// example: convert "2023-08-25T07:07:26.240Z" to "Today", "Yesterday", "Monday", "Aug 25"
+export function dateStringFormatV2(inputDate): string {
+    const currentDate = new Date();
+    const inputDateObj = new Date(inputDate);
+
+    // check if the input date is today
+    if (
+        inputDateObj.getDate() === currentDate.getDate() &&
+        inputDateObj.getMonth() === currentDate.getMonth() &&
+        inputDateObj.getFullYear() === currentDate.getFullYear()
+    ) {
+        return "Today";
+    }
+
+    // calculate the difference in days between inputDate and currentDate
+    const timeDiff = currentDate - inputDateObj;
+    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+    // check if the input date is yesterday
+    if (daysDiff === 1) {
+        return "Yesterday";
+    }
+
+    // create an array of weekday names
+    const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    // check if the input date is within the last 7 days and return the weekday name
+    if (daysDiff < 7) {
+        return weekdays[inputDateObj.getDay()];
+    }
+
+    // format the date as "Month Day" for older dates
+    return inputDateObj.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 // return example: "2023-08-25"
@@ -75,9 +111,9 @@ export function calculateAvgSpeed(distanceInMeters: number, durationInSeconds: n
 
 export function humanizedDistance(distanceInMeters: number): string {
     if (distanceInMeters < 1000) {
-        return `${distanceInMeters} m`;
+        return `${distanceInMeters}m`;
     } else {
-        return `${(distanceInMeters / 1000).toFixed(2)} km`;
+        return `${(distanceInMeters / 1000).toFixed(2)}km`;
     }
 }
 export function humanizedDuration(durationInSeconds: number): string {
@@ -86,15 +122,15 @@ export function humanizedDuration(durationInSeconds: number): string {
     const seconds = durationInSeconds - (hours * 3600) - (minutes * 60);
 
     if (hours > 0) {
-        return `${hours} h ${minutes} m ${seconds} s`;
+        return `${hours}h ${minutes}m ${seconds}s`;
     }
     if (minutes > 0) {
-        return `${minutes} m ${seconds} s`;
+        return `${minutes}m ${seconds}s`;
     }
-    return `${seconds} s`;
+    return `${seconds}s`;
 }
-export function humanizedAvgSpeed(avgSpeedMetersPerSeconds: number): string {
-    return `${avgSpeedMetersPerSeconds.toFixed(2)} meters/min`;
+export function humanizedAvgSpeed(avgSpeedMetersPerSeconds: number, showUnit: boolean): string {
+    return `${avgSpeedMetersPerSeconds.toFixed(2)} ${showUnit ? 'meters/min' : ''}`;
 }
 
 const humanizedDistancePartials = (distanceInMeters: number) => {

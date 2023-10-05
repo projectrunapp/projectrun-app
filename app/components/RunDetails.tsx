@@ -1,6 +1,6 @@
 
 import {StyleSheet, Text, View} from "react-native";
-import {dateStringFormat, humanizedAvgSpeed, humanizedDistance, humanizedDuration} from "../utils/helper";
+import {dateStringFormatV2, humanizedAvgSpeed, humanizedDistance, humanizedDuration} from "../utils/helper";
 
 export default function RunDetails({ run }: {
     run: {
@@ -17,11 +17,11 @@ export default function RunDetails({ run }: {
             <Text style={styles.run_title}>
                 {run.title}
             </Text>
-            <RunDetailsRow label="Started at:" value={dateStringFormat(run.started)} />
-            <RunDetailsRow label="Ended at:" value={dateStringFormat(run.completed)} />
+            <RunDetailsRow label="Started at:" value={dateStringFormatV2(run.started)} />
+            <RunDetailsRow label="Ended at:" value={dateStringFormatV2(run.completed)} />
             <RunDetailsRow label="Distance:" value={humanizedDistance(run.distance)} />
             <RunDetailsRow label="Duration:" value={humanizedDuration(run.duration)} />
-            <RunDetailsRow label="Average Speed:" value={humanizedAvgSpeed(run.avg_speed)} />
+            <RunDetailsRow label="Average Speed:" value={humanizedAvgSpeed(run.avg_speed, true)} />
         </View>
     );
 };

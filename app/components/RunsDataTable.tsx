@@ -6,6 +6,7 @@ import {useAuth} from "../context/AuthContext";
 import {paginationPerPages} from "../utils/app-constants";
 import {useNavigation} from "@react-navigation/native";
 import {Alert} from "react-native";
+import {dateStringFormatV2, humanizedAvgSpeed, humanizedDistance, humanizedDuration} from "../utils/helper";
 
 export default function RunsDataTable() {
     const navigation = useNavigation();
@@ -56,8 +57,10 @@ export default function RunsDataTable() {
     return (
         <DataTable>
             <DataTable.Header>
-                <DataTable.Title>ID</DataTable.Title>
                 <DataTable.Title>Title</DataTable.Title>
+                <DataTable.Title>Distance</DataTable.Title>
+                <DataTable.Title>Time</DataTable.Title>
+                <DataTable.Title>~ meters/min</DataTable.Title>
             </DataTable.Header>
             {
                 loading ? (
@@ -72,8 +75,10 @@ export default function RunsDataTable() {
                     ) : (
                         runs.map((run, index) => (
                             <DataTable.Row key={index} onPress={() => navigateToSingleRun(run.id, run.title)}>
-                                <DataTable.Cell>{run.id}</DataTable.Cell>
-                                <DataTable.Cell>{run.title}</DataTable.Cell>
+                                <DataTable.Cell>{dateStringFormatV2(run.started_at)}</DataTable.Cell>
+                                <DataTable.Cell>{humanizedDistance(run.distance)}</DataTable.Cell>
+                                <DataTable.Cell>{humanizedDuration(run.duration)}</DataTable.Cell>
+                                <DataTable.Cell>{humanizedAvgSpeed(run.avg_speed, false)}</DataTable.Cell>
                             </DataTable.Row>
                         ))
                     )

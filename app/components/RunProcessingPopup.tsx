@@ -167,7 +167,7 @@ export default function RunProcessingPopup({
                         {/*    Duration: {humanizedDuration(runningResults.duration)}*/}
                         {/*</Text>*/}
                         <Text style={styles.running_info}>
-                            Average Speed: {humanizedAvgSpeed(runningResults.avg_speed)}
+                            Average Speed: {humanizedAvgSpeed(runningResults.avg_speed, true)}
                         </Text>
                         <Text style={styles.running_info}>
                             Running Time: {humanizedDuration(runningTime)}
