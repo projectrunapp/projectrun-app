@@ -56,3 +56,6 @@ export const trackingTask = {
     body: "Location tracking in background",
     color: "#fff",
 };
+
+export const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];

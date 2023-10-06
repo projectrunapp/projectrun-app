@@ -109,11 +109,11 @@ export function calculateAvgSpeed(distanceInMeters: number, durationInSeconds: n
     return Math.round((distanceInMeters / durationInSeconds) * 60 * 100) / 100;
 }
 
-export function humanizedDistance(distanceInMeters: number): string {
+export function humanizedDistance(distanceInMeters: number, toFixedDigits = 2, showUnit = true): string {
     if (distanceInMeters < 1000) {
-        return `${distanceInMeters}m`;
+        return `${distanceInMeters}${showUnit ? 'm' : ''}`;
     } else {
-        return `${(distanceInMeters / 1000).toFixed(2)}km`;
+        return `${(distanceInMeters / 1000).toFixed(toFixedDigits)}${showUnit ? 'km' : ''}`;
     }
 }
 export function humanizedDuration(durationInSeconds: number): string {

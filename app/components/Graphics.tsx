@@ -1,21 +1,130 @@
 
-import { StyleSheet, View } from "react-native";
-import { VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
-
-// TODO: Replace this with real data
-const data = [
-    { quarter: 1, earnings: 13000 },
-    { quarter: 2, earnings: 16500 },
-    { quarter: 3, earnings: 14250 },
-    { quarter: 4, earnings: 19000 }
-];
+import {ActivityIndicator, Alert, StyleSheet, Text, View} from "react-native";
+import {VictoryAxis, VictoryBar, VictoryChart, VictoryLabel, VictoryTheme} from "victory-native";
+import axios from "axios";
+import {useAuth} from "../context/AuthContext";
+import React, {useEffect, useState} from "react";
+import MultiSwitch from "./MultiSwitch";
+import {humanizedDistance} from "../utils/helper";
+import {grayscale} from "victory-core/src/victory-theme/grayscale";
+import PropTypes from "prop-types";
+import {months, weekDays} from "../utils/app-constants";
 
 export const Graphics = () => {
+    const { authState } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState([]);
+    const [timeFrame, setTimeFrame] = useState("MONTH");
+
+    const loadRunsByTime = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${process.env.API_URL}/run/runs-by-time/${authState!.id}?interval=${timeFrame}`, {
+                headers: {
+                    Authorization: `Bearer ${authState!.token}`,
+                    // "Content-Type": "application/json",
+                }
+            });
+
+            if (response.data.success) {
+                const result = [];
+                for (const timing in response.data.data) {
+                    if (response.data.data.hasOwnProperty(timing)) {
+                        const timingParts = timing.split("-");
+                        let timingFrame = "";
+
+                        switch (timeFrame) {
+                            case "WEEK": case "MONTH":
+                                timingFrame = timingParts[2];
+                                break;
+                            case "YEAR":
+                                timingFrame = timingParts[1];
+                                break;
+                            default: // "ALL"
+                                timingFrame = timingParts[0];
+                        }
+
+                        result.push({
+                            timing: timingFrame,
+                            distance: response.data.data[timing].distance,
+                        });
+                    }
+                }
+                setData(result);
+            }
+            setLoading(false);
+        } catch (err) {
+            // console.error(err.message);
+            setLoading(false);
+            Alert.alert('Error', "Something went wrong!");
+        }
+    };
+
+    const xAxisLabel = (): string => {
+        const thisMonth = new Date().getMonth();
+        return timeFrame === "WEEK" || timeFrame === "MONTH"
+            ? months[thisMonth]
+            : (timeFrame === "YEAR" ? "months" : "years")
+    };
+    const xAxisTickFormat = (x: string): string => {
+        const index = (Number(x) - 1).toString();
+
+        return timeFrame === "YEAR"
+            ? months[index]
+            : (timeFrame === "WEEK" ? weekDays[index] : Number(x))
+    };
+
+    useEffect(() => {
+        loadRunsByTime();
+    }, [timeFrame]);
+
     return (
         <View style={styles.container}>
-            <VictoryChart width={350} theme={VictoryTheme.material}>
-                <VictoryBar data={data} x="quarter" y="earnings" />
-            </VictoryChart>
+            <View style={styles.graphics_header}>
+                <Text style={styles.graphics_header_text}>Distance by time</Text>
+            </View>
+            <View style={styles.time_frame_switcher_container}>
+                <MultiSwitch items={["WEEK", "MONTH", "YEAR", "ALL"]}
+                             value={timeFrame}
+                             onChange={(val) => setTimeFrame(val)}
+                />
+            </View>
+            {loading ? (
+                <View style={styles.loading_container}>
+                    <ActivityIndicator size="large" />
+                </View>
+            ) : (
+                <VictoryChart theme={VictoryTheme.material}
+                    // padding={{ left: 50, right: 50, top: 20, bottom: 50 }}
+                    // domainPadding={{ x: 20, y: 20 }}
+                    // style={{parent: {marginLeft: 50, paddingLeft: 50}, tickLabels: {fontSize: 8, padding: 5}}}
+                    width={350} height={300}
+                >
+                    <VictoryAxis
+                        style={{
+                            axisLabel: {fontSize: 12, fontWeight: "bold"},
+                        }}
+                        label={data[0].distance > 1000 ? "km" : "m"}
+                        dependentAxis={true}
+                        tickFormat={y => humanizedDistance(y, 0, false)}
+                        axisLabelComponent={<VictoryLabel dx={100} />}
+                        // tickLabelComponent={<VictoryLabel angle={-45} />}
+                    />
+                    <VictoryAxis
+                        style={timeFrame === "MONTH" ? {
+                            tickLabels: {fontSize: 7, fontWeight: "bold"},
+                            axisLabel: {fontSize: 12, fontWeight: "bold"},
+                        } : {
+                            axisLabel: {fontSize: 12, fontWeight: "bold"},
+                        }}
+                        label={xAxisLabel()}
+                        dependentAxis={false}
+                        tickFormat={x => xAxisTickFormat(x)}
+                        axisLabelComponent={<VictoryLabel dx={120} dy={20} />}
+                    />
+                    <VictoryBar data={data} x="timing" y="distance" />
+                </VictoryChart>
+            )}
         </View>
     );
 };
@@ -25,6 +134,23 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f5fcff"
-    }
+        backgroundColor: "#f5fcff",
+    },
+    graphics_header: {
+        margin: 10,
+    },
+    graphics_header_text: {
+        fontSize: 16,
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    time_frame_switcher_container: {
+        margin: 10,
+    },
+    loading_container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        height: 300,
+    },
 });

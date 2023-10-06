@@ -5,7 +5,7 @@ import axios from "axios";
 import {useAuth} from "../context/AuthContext";
 import {paginationPerPages} from "../utils/app-constants";
 import {useNavigation} from "@react-navigation/native";
-import {Alert} from "react-native";
+import {Alert, StyleSheet, Text, View} from "react-native";
 import {dateStringFormatV2, humanizedAvgSpeed, humanizedDistance, humanizedDuration} from "../utils/helper";
 
 export default function RunsDataTable() {
@@ -55,46 +55,62 @@ export default function RunsDataTable() {
     }, [page, perPage]);
 
     return (
-        <DataTable>
-            <DataTable.Header>
-                <DataTable.Title>Title</DataTable.Title>
-                <DataTable.Title>Distance</DataTable.Title>
-                <DataTable.Title>Time</DataTable.Title>
-                <DataTable.Title>~ meters/min</DataTable.Title>
-            </DataTable.Header>
-            {
-                loading ? (
-                    <DataTable.Row>
-                        <DataTable.Cell>Loading...</DataTable.Cell>
-                    </DataTable.Row>
-                ) : (
-                    total === 0 ? (
+        <>
+            <View style={styles.datatable_header}>
+                <Text style={styles.datatable_header_text}>Recent Runs</Text>
+            </View>
+            <DataTable>
+                <DataTable.Header>
+                    <DataTable.Title>Title</DataTable.Title>
+                    <DataTable.Title>Distance</DataTable.Title>
+                    <DataTable.Title>Time</DataTable.Title>
+                    <DataTable.Title>~ meters/min</DataTable.Title>
+                </DataTable.Header>
+                {
+                    loading ? (
                         <DataTable.Row>
-                            <DataTable.Cell>No runs yet :(</DataTable.Cell>
+                            <DataTable.Cell>Loading...</DataTable.Cell>
                         </DataTable.Row>
                     ) : (
-                        runs.map((run, index) => (
-                            <DataTable.Row key={index} onPress={() => navigateToSingleRun(run.id, run.title)}>
-                                <DataTable.Cell>{dateStringFormatV2(run.started_at)}</DataTable.Cell>
-                                <DataTable.Cell>{humanizedDistance(run.distance)}</DataTable.Cell>
-                                <DataTable.Cell>{humanizedDuration(run.duration)}</DataTable.Cell>
-                                <DataTable.Cell>{humanizedAvgSpeed(run.avg_speed, false)}</DataTable.Cell>
+                        total === 0 ? (
+                            <DataTable.Row>
+                                <DataTable.Cell>No runs yet :(</DataTable.Cell>
                             </DataTable.Row>
-                        ))
+                        ) : (
+                            runs.map((run, index) => (
+                                <DataTable.Row key={index} onPress={() => navigateToSingleRun(run.id, run.title)}>
+                                    <DataTable.Cell>{dateStringFormatV2(run.started_at)}</DataTable.Cell>
+                                    <DataTable.Cell>{humanizedDistance(run.distance)}</DataTable.Cell>
+                                    <DataTable.Cell>{humanizedDuration(run.duration)}</DataTable.Cell>
+                                    <DataTable.Cell>{humanizedAvgSpeed(run.avg_speed, false)}</DataTable.Cell>
+                                </DataTable.Row>
+                            ))
+                        )
                     )
-                )
-            }
-            <DataTable.Pagination
-                page={page}
-                numberOfPages={Math.ceil(total / perPage)}
-                onPageChange={page => setPage(page)}
-                label={`${perPage} runs per page`}
-                showFastPaginationControls
-                numberOfItemsPerPageList={paginationPerPages}
-                numberOfItemsPerPage={perPage}
-                onItemsPerPageChange={value => setPerPage(value)}
-                selectPageDropdownLabel={'Rows per page'}
-            />
-        </DataTable>
+                }
+                <DataTable.Pagination
+                    page={page}
+                    numberOfPages={Math.ceil(total / perPage)}
+                    onPageChange={page => setPage(page)}
+                    label={`${perPage} runs per page`}
+                    showFastPaginationControls
+                    numberOfItemsPerPageList={paginationPerPages}
+                    numberOfItemsPerPage={perPage}
+                    onItemsPerPageChange={value => setPerPage(value)}
+                    selectPageDropdownLabel={'Rows per page'}
+                />
+            </DataTable>
+        </>
     );
 };
+
+const styles = StyleSheet.create({
+    datatable_header: {
+        marginTop: 16,
+    },
+    datatable_header_text: {
+        fontSize: 16,
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+});
