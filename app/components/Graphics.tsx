@@ -8,7 +8,9 @@ import MultiSwitch from "./MultiSwitch";
 import {humanizedDistance} from "../utils/helper";
 import {appPrimaryColor, months, weekDays} from "../utils/app-constants";
 
-export const Graphics = () => {
+export const Graphics = ({ userId }: {
+    userId?: number,
+}) => {
     const { authState } = useAuth();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
@@ -17,7 +19,7 @@ export const Graphics = () => {
     const loadRunsByTime = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${process.env.API_URL}/run/runs-by-time/${authState!.id}?interval=${timeFrame}`, {
+            const response = await axios.get(`${process.env.API_URL}/run/runs-by-time/${userId ? userId : authState!.id}?interval=${timeFrame}`, {
                 headers: {
                     Authorization: `Bearer ${authState!.token}`,
                     // "Content-Type": "application/json",
@@ -106,7 +108,7 @@ export const Graphics = () => {
                         onLoad: { duration: 250 }
                     }}
                 >
-                    <VictoryAxis
+                    {data.length > 0 && (<VictoryAxis
                         style={{
                             axisLabel: {fontSize: 12, fontWeight: "bold"},
                         }}
@@ -115,8 +117,8 @@ export const Graphics = () => {
                         tickFormat={y => humanizedDistance(y, 0, false)}
                         axisLabelComponent={<VictoryLabel dx={110} />}
                         // tickLabelComponent={<VictoryLabel angle={-45} />}
-                    />
-                    <VictoryAxis
+                    />)}
+                    {data.length > 0 && (<VictoryAxis
                         style={timeFrame === "MONTH" ? {
                             tickLabels: {fontSize: 7, fontWeight: "bold"},
                             axisLabel: {fontSize: 12, fontWeight: "bold"},
@@ -127,7 +129,7 @@ export const Graphics = () => {
                         dependentAxis={false}
                         tickFormat={x => xAxisTickFormat(x)}
                         axisLabelComponent={<VictoryLabel dx={120} dy={20} />}
-                    />
+                    />)}
                     <VictoryBar data={data}
                                 style={{
                                     data: {

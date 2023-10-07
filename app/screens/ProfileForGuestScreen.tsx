@@ -8,6 +8,7 @@ import ActionButtonsForSearchedUser from "./Friendship/ActionButtonsForSearchedU
 import PopupMessage from "../components/PopupMessage";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {getAgeFromBirthDate} from "../utils/helper";
+import {Graphics} from "../components/Graphics";
 
 export default function ProfileForGuestScreen({ route }: any) {
     const { userId } = route.params;
@@ -112,6 +113,7 @@ export default function ProfileForGuestScreen({ route }: any) {
                         profile.bio ? profile.bio : "No bio yet :("
                     }</Text>
                 </View>
+                <Graphics userId={profile.id} />
             </>)}
         </ScrollView>
     )
