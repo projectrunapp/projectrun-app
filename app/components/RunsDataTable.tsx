@@ -61,10 +61,10 @@ export default function RunsDataTable() {
             </View>
             <DataTable>
                 <DataTable.Header>
-                    <DataTable.Title>Title</DataTable.Title>
+                    <DataTable.Title>Day</DataTable.Title>
                     <DataTable.Title>Distance</DataTable.Title>
                     <DataTable.Title>Time</DataTable.Title>
-                    <DataTable.Title>~ meters/min</DataTable.Title>
+                    <DataTable.Title>Avg. speed</DataTable.Title>
                 </DataTable.Header>
                 {
                     loading ? (

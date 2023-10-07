@@ -6,9 +6,7 @@ import {useAuth} from "../context/AuthContext";
 import React, {useEffect, useState} from "react";
 import MultiSwitch from "./MultiSwitch";
 import {humanizedDistance} from "../utils/helper";
-import {grayscale} from "victory-core/src/victory-theme/grayscale";
-import PropTypes from "prop-types";
-import {months, weekDays} from "../utils/app-constants";
+import {appPrimaryColor, months, weekDays} from "../utils/app-constants";
 
 export const Graphics = () => {
     const { authState } = useAuth();
@@ -44,6 +42,7 @@ export const Graphics = () => {
                                 timingFrame = timingParts[0];
                         }
 
+                        // TODO: decide weather to implement this logic on mobile or on backend
                         result.push({
                             timing: timingFrame,
                             distance: response.data.data[timing].distance,
@@ -81,7 +80,7 @@ export const Graphics = () => {
     return (
         <View style={styles.container}>
             <View style={styles.graphics_header}>
-                <Text style={styles.graphics_header_text}>Distance by time</Text>
+                <Text style={styles.graphics_header_text}>Activity</Text>
             </View>
             <View style={styles.time_frame_switcher_container}>
                 <MultiSwitch items={["WEEK", "MONTH", "YEAR", "ALL"]}
@@ -96,9 +95,16 @@ export const Graphics = () => {
             ) : (
                 <VictoryChart theme={VictoryTheme.material}
                     // padding={{ left: 50, right: 50, top: 20, bottom: 50 }}
-                    // domainPadding={{ x: 20, y: 20 }}
-                    // style={{parent: {marginLeft: 50, paddingLeft: 50}, tickLabels: {fontSize: 8, padding: 5}}}
+                    domainPadding={{ x: 15, y: 15 }}
                     width={350} height={300}
+                    style={{
+                        // parent: {marginLeft: 50, paddingLeft: 50},
+                        background: {fill: "#f5fcff"},
+                    }}
+                    animate={{
+                        duration: 1000,
+                        onLoad: { duration: 250 }
+                    }}
                 >
                     <VictoryAxis
                         style={{
@@ -107,7 +113,7 @@ export const Graphics = () => {
                         label={data[0].distance > 1000 ? "km" : "m"}
                         dependentAxis={true}
                         tickFormat={y => humanizedDistance(y, 0, false)}
-                        axisLabelComponent={<VictoryLabel dx={100} />}
+                        axisLabelComponent={<VictoryLabel dx={110} />}
                         // tickLabelComponent={<VictoryLabel angle={-45} />}
                     />
                     <VictoryAxis
@@ -122,7 +128,16 @@ export const Graphics = () => {
                         tickFormat={x => xAxisTickFormat(x)}
                         axisLabelComponent={<VictoryLabel dx={120} dy={20} />}
                     />
-                    <VictoryBar data={data} x="timing" y="distance" />
+                    <VictoryBar data={data}
+                                style={{
+                                    data: {
+                                        fill: appPrimaryColor,
+                                        // width: 10,
+                                    }
+                                }}
+                                x="timing"
+                                y="distance"
+                    />
                 </VictoryChart>
             )}
         </View>

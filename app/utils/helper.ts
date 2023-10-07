@@ -47,8 +47,8 @@ export function dateStringFormatV1(dateString: number): string {
     return time;
 }
 
-// example: convert "2023-08-25T07:07:26.240Z" to "Today", "Yesterday", "Monday", "Aug 25"
-export function dateStringFormatV2(inputDate): string {
+// example: convert "2023-08-25T07:07:26.240Z" to "Today 7:07 AM"
+export function dateStringFormatV2(inputDate, showDayTime = false): string {
     const currentDate = new Date();
     const inputDateObj = new Date(inputDate);
 
@@ -75,11 +75,19 @@ export function dateStringFormatV2(inputDate): string {
 
     // check if the input date is within the last 7 days and return the weekday name
     if (daysDiff < 7) {
-        return weekdays[inputDateObj.getDay()];
+        if (showDayTime) {
+            return `${weekdays[inputDateObj.getDay()]} ${inputDateObj.toLocaleTimeString(undefined, {
+                hour: "numeric", minute: "numeric", hour12: true
+            })}`;
+        } else {
+            return weekdays[inputDateObj.getDay()];
+        }
     }
 
     // format the date as "Month Day" for older dates
-    return inputDateObj.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    return inputDateObj.toLocaleDateString(undefined, {
+        month: "short", day: "numeric"
+    });
 }
 
 // return example: "2023-08-25"
